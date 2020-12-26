@@ -1,0 +1,12 @@
+{% extends 'allianceauth/base.html' %}
+{% load i18n %}
+
+{% block page_title %}{% translate "Buybacks" %}{% endblock %}
+
+{% block content %}
+    <div class="buybacks">
+        <h1 class="page-header text-center">{% translate "Buybacks" %}</h1>
+
+        {% block details %}{% endblock %}
+    </div>
+{% endblock %}
