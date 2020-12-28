@@ -26,6 +26,11 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
+                {% if perms.freight.manage_programs %}
+                    <a class="btn btn-default navbar-btn" href="{% url 'buybacks:program_add' %}">
+                        Add Program
+                    </a>
+                {% endif %}
                 {% if perms.freight.setup_retriever %}
                     <a class="btn btn-default navbar-btn" href="{% url 'buybacks:setup' %}">
                         Setup Corp

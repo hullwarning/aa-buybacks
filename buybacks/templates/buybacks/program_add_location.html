@@ -1,0 +1,21 @@
+{% extends 'buybacks/page.html' %}
+{% load i18n %}
+{% load humanize %}
+{% load bootstrap %}
+
+{% block body %}
+<form class="form" action="{% url 'buybacks:program_add_location' program_pk=program.id %}" method="POST">
+  {% csrf_token %}
+  {{ form|bootstrap }}
+  <button type="submit" class="btn btn-primary">Add location</button>
+</form>
+{% endblock %}
+
+{% block extra_javascript %}
+{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block extra_script %}
+{% endblock %}

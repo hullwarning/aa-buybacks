@@ -5,12 +5,13 @@ from allianceauth.eveonline.models import EveCorporationInfo
 from allianceauth.services.hooks import get_extension_logger
 from esi.errors import TokenExpiredError, TokenInvalidError
 from esi.models import Token
-from eveuniverse.models import EveSolarSystem
+from eveuniverse.models import EveSolarSystem, EveType
 
 from . import __title__
 from .helpers import esi_fetch
 from .utils import LoggerAddTag, make_logger_prefix
 from .managers import LocationManager
+from .validators import validate_brokerage
 
 # Create your models here.
 
@@ -214,3 +215,73 @@ class Office(models.Model):
         on_delete=models.deletion.CASCADE,
         related_name="+",
     )
+
+    def __str__(self):
+        return self.location.name
+
+
+class Program(models.Model):
+    """An Eve Online buyback program for a corp"""
+
+    id = models.AutoField(
+        primary_key=True,
+    )
+    corporation = models.ForeignKey(
+        Corporation,
+        on_delete=models.deletion.CASCADE,
+        related_name='+',
+    )
+    name = models.CharField(
+        max_length=100,
+    )
+
+
+class ProgramItem(models.Model):
+    """Items in the buyback program for a corp"""
+
+    id = models.AutoField(
+        primary_key=True,
+    )
+    program = models.ForeignKey(
+        Program,
+        on_delete=models.deletion.CASCADE,
+        related_name='+',
+    )
+    item_type = models.ForeignKey(
+        EveType,
+        on_delete=models.deletion.CASCADE,
+        related_name='+',
+    )
+    brokerage = models.PositiveIntegerField(
+        help_text='Jita max buy - x%',
+        validators=[validate_brokerage],
+    )
+    use_refined_value = models.BooleanField(
+        blank=True,
+        default=None,
+        null=True,
+    )
+
+    class Meta:
+        unique_together = ['program', 'item_type']
+
+
+class ProgramLocation(models.Model):
+    """Locations for buyback program for a corp"""
+
+    id = models.AutoField(
+        primary_key=True,
+    )
+    program = models.ForeignKey(
+        Program,
+        on_delete=models.deletion.CASCADE,
+        related_name='+',
+    )
+    office = models.ForeignKey(
+        Office,
+        on_delete=models.deletion.CASCADE,
+        related_name='+',
+    )
+
+    class Meta:
+        unique_together = ['program', 'office']

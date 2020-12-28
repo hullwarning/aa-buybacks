@@ -8,8 +8,9 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('authentication', '0016_ownershiprecord'),
-        ('eveonline', '0010_alliance_ticker'),
+        ('eveuniverse', '0004_effect_longer_name'),
+        ('authentication', '0017_remove_fleetup_permission'),
+        ('eveonline', '0012_index_additions'),
     ]
 
     operations = [
