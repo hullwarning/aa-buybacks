@@ -31,6 +31,9 @@ This app helps running buyback programs for an alliance or corporation.
 
 It offers the following main features:
 
+* Manage corporation buyback programs
+* Calculate value of the items that will be sent to the buyback program
+* Store statistics on the usage of buyback programs
 
 ## Installation
 
