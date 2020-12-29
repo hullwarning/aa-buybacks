@@ -8,6 +8,7 @@
 
 from time import sleep
 
+import requests
 from allianceauth.services.hooks import get_extension_logger
 from bravado.exception import HTTPBadGateway, HTTPServiceUnavailable, HTTPGatewayTimeout
 from esi.clients import esi_client_factory
@@ -23,6 +24,34 @@ ESI_MAX_RETRIES = 3
 ESI_RETRY_SLEEP_SECS = 1
 
 _my_esi_client = None
+
+
+def evemarketer(
+    typeids: [int] = [],
+) -> [dict]:
+    if len(typeids) == 0:
+        return {}
+
+    response = requests.get(
+        'https://api.evemarketer.com/ec/marketstat/json',
+        params={
+            'typeid': ','.join([str(x) for x in typeids]),
+            'regionlimit': 10000002,
+        },
+    )
+
+    items = response.json()
+    result = {}
+
+    for item in items:
+        id = item['buy']['forQuery']['types'][0]
+
+        result[id] = {
+            'buy': item['buy']['max'],
+            'sell': item['sell']['min'],
+        }
+
+    return result
 
 
 def esi_fetch(

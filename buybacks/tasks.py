@@ -57,6 +57,30 @@ def update_all_offices():
         )
 
 
+@shared_task(
+    **{
+        **TASK_ESI_KWARGS,
+        **{
+            "base": QueueOnce,
+            "once": {"keys": ["corp_pk"], "graceful": True},
+            "max_retries": None,
+        },
+    }
+)
+def sync_contracts_for_corp(self, corp_pk):
+    """fetches all contracts for corp from ESI"""
+    return _get_corp(corp_pk).sync_contracts_esi()
+
+
+@shared_task(**TASK_DEFAULT_KWARGS)
+def sync_all_contracts():
+    for corp in Corporation.objects.all():
+        sync_contracts_for_corp.apply_async(
+            kwargs={"corp_pk": corp.pk},
+            priority=DEFAULT_TASK_PRIORITY,
+        )
+
+
 def _get_corp(corp_pk: int) -> Corporation:
     """returns the corp or raises exception"""
     try:

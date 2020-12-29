@@ -16,19 +16,17 @@
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                {% if perms.buybacks.manage_programs %}
-                    <li class="{% navactive request 'buybacks:manage' %}">
-                        <a href="{% url 'buybacks:manage' %}">
-                            Manage Programs
-                        </a>
-                    </li>
-                {% endif %}
+                <!-- <li class="{% navactive request 'buybacks:index' %}">
+                    <a href="#">
+                        Statistics
+                    </a>
+                </li> -->
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
                 {% if perms.freight.manage_programs %}
                     <a class="btn btn-default navbar-btn" href="{% url 'buybacks:program_add' %}">
-                        Add Program
+                        Create Program
                     </a>
                 {% endif %}
                 {% if perms.freight.setup_retriever %}

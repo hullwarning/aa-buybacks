@@ -41,5 +41,7 @@ setup(
         "celery-once>=2.0.1",
         "django-esi>=2.0.4",
         "django-eveuniverse>=0.6.1",
+        "django-navhelper",
+        "requests",
     ],
 )

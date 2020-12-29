@@ -18,10 +18,9 @@ This is a buyback program management app for [Alliance Auth](https://gitlab.com/
    6. [6. Setup permissions](#6-setup-permissions)
    7. [7. Setup corp](#7-setup-corp)
    8. [8. Define programs](#8-define-programs)
+   9. [9. Calculating](#9-calculating)
 3. [Updating](#updating)
-4. [Settings](#settings)
-5. [Permissions](#permissions)
-6. [Contract Check](#contract-check)
+4. [Permissions](#permissions)
 
 <!-- omit in toc -->
 ## Overview
@@ -58,7 +57,7 @@ esi-assets.read_corporation_assets.v1
 Configure your AA settings (`local.py`) as follows:
 
 - Add `'buybacks'` to `INSTALLED_APPS`
-- Add these lines add to bottom of your settings file:
+- Add these lines to bottom of your settings file:
 
    ```python
    # settings for buybacks
@@ -66,7 +65,7 @@ Configure your AA settings (`local.py`) as follows:
        'task': 'buybacks.tasks.update_all_offices',
        'schedule': crontab(minute=0, hour='*/12'),
    }
-   CELERYBEAT_SCHEDULE['buybacks_sync_contracts'] = {
+   CELERYBEAT_SCHEDULE['buybacks_sync_all_contracts'] = {
        'task': 'buybacks.tasks.sync_all_contracts',
        'schedule': crontab(minute=0, hour='*'),
    }
@@ -97,16 +96,31 @@ Now you can access Alliance Auth and setup permissions for your users. See secti
 
 ### 7. Setup corp
 
-Finally you need to set a corporation with the character that will be used for fetching the corporation offices, contracts and related structures. Just click on "Setup Corp" and add the requested token.
+Finally you need to set a corporation with the character that will be used for fetching the corporation offices, contracts and related structures. Just click on **Setup Corp** and add the requested token.
 
-> Note that only users with the appropriate permission will be able to see and use this function.
+> Note that only users with the appropriate permission will be able to see and use this button.
 
 > Note that the respective character needs to be a director for the corporation.
 
 ### 8. Define programs
 
+Let's say your corp has an ORE buyback program and you want to use this tool for that. First, you need to click on **Create Program** and fill the name of the program.
 
-That's it. The Buybacks app is fully installed and ready to be used.
+> Note that only users with the appropriate permission will be able to see and use this button.
+
+Once it is created, you should be able to add all the locations (where your corp has an office) denoting the structures or stations to create the contracts for. You might only accept the ores in certain corp refineries and don't want people to send it other structures.
+
+You should also be able to add all the items and the percentage the corp skims on top of the price. For example, for your ORE buyback program, add **Plagioclase** with brokerage set at 20%.
+
+That's it. The buybacks program is fully created and ready to be used.
+
+### 9. Calculating
+
+Any character can use one of the buyback programs by clicking on **Use this program** button on one of the program. Once done, they need to select the location and can copy-paste the items they want to send to the corp. When they click on **Calculate**, the app calculates the exact amount based on the prices defined in the program and shows them that total value.
+
+Once they see the total value, they would need to send an in-game contract for the exact amount and then click on **Notify** to notify the app about it.
+
+Once the corp accepts the contract, our contracts sync feature would automatically match the notification and store it in the statistics.
 
 ## Updating
 
@@ -125,41 +139,12 @@ python manage.py collectstatic
 
 Finally restart your AA supervisor services.
 
-## Settings
-
-Here is a list of available settings for this app. They can be configured by adding them to your AA settings file (`local.py`). If they are not set the defaults are used.
-
-Name | Description | Default
--- | -- | --
-`FREIGHT_STATISTICS_MAX_DAYS`| Sets the number of days that are considered for creating the statistics  | `90`
-
 ## Permissions
 
 This is an overview of all permissions used by this app:
 
 Name | Purpose | Code
 -- | -- | --
-Can add / update locations | User can add and update Eve Online contract locations, e.g. stations and upwell structures |  `add_location`
-Can access this app |Enabling the app for a user. This permission should be enabled for everyone who is allowed to use the app (e.g. Member state) |  `basic_access`
-Can setup contract handler | Add or updates the character for syncing contracts. This should be limited to users with admins / leadership privileges. |  `setup_contract_handler`
-Can use the calculator | Enables using the calculator page and the "My Contracts" page. This permission is usually enabled for every user with the member state. |  `use_calculator`
-Can view the contracts list | Enables viewing the page with all outstanding courier contracts  |  `view_contracts`
-Can see statistics | User with this permission can view the statistics page  |  `view_statistics`
-
-> **How to add new locations**:<br>If you are creating a pricing for a new route you may need to first add the locations (stations and/or structures).<br>The easiest way is to create a courier contract between those locations in game and then run contract sync. Those locations will then be added automatically.<br>Alternatively you can use the "Add Location" feature on the main page of the app. This will require you to provide the respective station or structure eve ID.
-
-## Contract Check
-
-The app will automatically check if a newly issued contract complies with the pricing parameters for the respective route.
-
-Compliant contracts will have a green checkmark (✓) in the "Contract Check" column on the contract list. Related notifications on Discord will be colored in green.
-
-Non-compliant contracts will have a red warning sign in the "Contract Check" column on the contract list. And related notifications on Discord will be colored in red. In addition the first customer notification will inform the customer about the issues and ask him to correct the issues.
-
-The following parameters will be checked (if they have been defined):
-
-- reward in contract >= calculated reward
-- volume min <= volume in contract <= volume max
-- collateral min <= collateral in contract <= collateral max
-
-Deviations on "Days to expire" and "Days to complete" are currently not part of the contract check and only used to show the recommended contract parameters in the calculator.
+Can access this app and view buyback programs |Enabling the app for a user. This permission should be enabled for everyone who is allowed to use the app (e.g. Member state) | `basic_access`
+Can setup corporation | Add or updates the character for syncing offices and contracts. This should be limited to users with admins / leadership privileges. | `setup_retriever`
+Can manage buyback programs | User with this permission can manage the buyback programs and view the cumulative statistics | `manage_programs`

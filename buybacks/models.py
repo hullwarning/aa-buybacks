@@ -1,5 +1,8 @@
+import json
 from typing import Tuple
+
 from django.db import models
+from django.contrib.auth.models import User
 from allianceauth.authentication.models import CharacterOwnership
 from allianceauth.eveonline.models import EveCorporationInfo
 from allianceauth.services.hooks import get_extension_logger
@@ -63,17 +66,100 @@ class Corporation(models.Model):
     class Meta:
         default_permissions = ()
 
+    def sync_contracts_esi(self):
+        token = self.token(
+            [
+                'esi-contracts.read_corporation_contracts.v1',
+            ]
+        )[0]
+
+        contracts = esi_fetch(
+            'Contracts.get_corporations_corporation_id_contracts',
+            args={
+                'corporation_id': self.corporation.corporation_id,
+            },
+            has_pages=True,
+            token=token,
+            logger_tag=self._logger_prefix(),
+        )
+
+        buybacks = [
+            x
+            for x in contracts
+            if x['type'] == 'item_exchange'
+            and x['status'] == 'finished'
+            and int(x['assignee_id']) == self.corporation.corporation_id
+        ]
+
+        for contract in buybacks:
+            notification = Notification.objects.filter(
+                program_location__office__location__id=contract['start_location_id'],
+                total=contract['price'],
+            ).first()
+
+            if notification is not None:
+                items = esi_fetch(
+                    'Contracts.get_corporations_corporation_id_contracts_contract_id_items',
+                    args={
+                        'corporation_id': self.corporation.corporation_id,
+                        'contract_id': contract['contract_id'],
+                    },
+                    token=token,
+                    logger_tag=self._logger_prefix(),
+                )
+
+                quantities = {}
+
+                for item in items:
+                    if item['is_included']:
+                        type_id = int(item['type_id'])
+                        quantity = int(item['quantity'])
+
+                        if type_id in quantities:
+                            quantities[type_id] += quantity
+                        else:
+                            quantities[type_id] = quantity
+
+                data = json.loads(notification.items)
+                match = True
+
+                for type_id in data:
+                    type_id = int(type_id)
+
+                    if type_id not in quantities or quantities[type_id] != data[str(type_id)]:
+                        match = False
+
+                if match:
+                    character = CharacterOwnership.objects.filter(
+                        character__character_id=contract['issuer_id']
+                    ).first()
+
+                    if character is not None:
+                        Notification.objects.filter(
+                            pk=notification.id,
+                        ).delete()
+
+                        Contract.objects.create(
+                            id=contract['contract_id'],
+                            program=notification.program_location.program,
+                            character=character,
+                            total=contract['price'],
+                            date=contract['date_issued'],
+                        )
+
     def update_offices_esi(self):
         token = self.token(
             [
-                "esi-universe.read_structures.v1",
-                "esi-assets.read_corporation_assets.v1",
+                'esi-universe.read_structures.v1',
+                'esi-assets.read_corporation_assets.v1',
             ]
         )[0]
 
         assets = esi_fetch(
-            "Assets.get_corporations_corporation_id_assets",
-            args={"corporation_id": self.corporation.corporation_id},
+            'Assets.get_corporations_corporation_id_assets',
+            args={
+                'corporation_id': self.corporation.corporation_id,
+            },
             has_pages=True,
             token=token,
             logger_tag=self._logger_prefix(),
@@ -81,7 +167,8 @@ class Corporation(models.Model):
 
         office_ids_to_remove = list(
             Office.objects.filter(
-                corporation=self).values_list("id", flat=True)
+                corporation=self
+            ).values_list('id', flat=True)
         )
 
         for asset in assets:
@@ -283,5 +370,48 @@ class ProgramLocation(models.Model):
         related_name='+',
     )
 
+    def __str__(self):
+        return self.office.location.name
+
     class Meta:
         unique_together = ['program', 'office']
+
+
+class Notification(models.Model):
+    """Notifiaction by user that he is sending contract"""
+
+    id = models.AutoField(
+        primary_key=True,
+    )
+    program_location = models.ForeignKey(
+        ProgramLocation,
+        on_delete=models.deletion.CASCADE,
+        related_name='+',
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.deletion.CASCADE,
+        related_name='+',
+    )
+    total = models.PositiveBigIntegerField()
+    items = models.TextField()
+
+
+class Contract(models.Model):
+    """Contract that is accepted in the buyback program"""
+
+    id = models.PositiveBigIntegerField(
+        primary_key=True,
+    )
+    program = models.ForeignKey(
+        Program,
+        on_delete=models.deletion.CASCADE,
+        related_name='+',
+    )
+    character = models.ForeignKey(
+        CharacterOwnership,
+        on_delete=models.deletion.CASCADE,
+        related_name='+',
+    )
+    total = models.PositiveBigIntegerField()
+    date = models.DateTimeField()
