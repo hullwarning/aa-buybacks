@@ -10,17 +10,17 @@ This is a buyback program management app for [Alliance Auth](https://gitlab.com/
 
 1. [Key Features](#key-features)
 2. [Installation](#installation)
-   1. [1. Install app](#1-install-app)
-   2. [2. Update Eve Online app](#2-update-eve-online-app)
-   3. [3. Configure AA settings](#3-configure-aa-settings)
-   4. [4. Finalize installation into AA](#4-finalize-installation-into-aa)
-   5. [5. Data import](#5-data-import)
-   6. [6. Setup permissions](#6-setup-permissions)
-   7. [7. Setup corp](#7-setup-corp)
-   8. [8. Define programs](#8-define-programs)
-   9. [9. Calculating](#9-calculating)
+   1. [Install app](#install-app)
+   2. [Update Eve Online app](#update-eve-online-app)
+   3. [Configure AA settings](#configure-aa-settings)
+   4. [Finalize installation into AA](#finalize-installation-into-aa)
+   5. [Data import](#data-import)
+   6. [Setup permissions](#setup-permissions)
+   7. [Setup corp](#setup-corp)
+   8. [Define programs](#define-programs)
+   9. [Calculating](#calculating)
 3. [Updating](#updating)
-4. [Permissions](#permissions)
+4. [TODO](#todo)
 
 <!-- omit in toc -->
 ## Overview
@@ -34,7 +34,7 @@ It offers the following main features:
 
 ## Installation
 
-### 1. Install app
+### Install app
 
 Install into your Alliance Auth virtual environment from PyPI:
 
@@ -42,7 +42,7 @@ Install into your Alliance Auth virtual environment from PyPI:
 pip install aa-buybacks
 ```
 
-### 2. Update Eve Online app
+### Update Eve Online app
 
 Update the Eve Online app used for authentication in your AA installation to include the following scopes:
 
@@ -52,7 +52,7 @@ esi-contracts.read_corporation_contracts.v1
 esi-assets.read_corporation_assets.v1
 ```
 
-### 3. Configure AA settings
+### Configure AA settings
 
 Configure your AA settings (`local.py`) as follows:
 
@@ -71,7 +71,7 @@ Configure your AA settings (`local.py`) as follows:
    }
    ```
 
-### 4. Finalize installation into AA
+### Finalize installation into AA
 
 Run migrations & copy static files
 
@@ -82,7 +82,7 @@ python manage.py collectstatic
 
 Restart your supervisor services for AA
 
-### 5. Data import
+### Data import
 
 Load EVE Online type data from ESI:
 
@@ -90,11 +90,17 @@ Load EVE Online type data from ESI:
 python manage.py buybacks_load_types
 ```
 
-### 6. Setup permissions
+### Setup permissions
 
-Now you can access Alliance Auth and setup permissions for your users. See section **Permissions** below for details.
+Now you can access Alliance Auth and setup permissions for your users. This is an overview of all permissions used by this app:
 
-### 7. Setup corp
+Name | Purpose | Code
+-- | -- | --
+Can access this app and view buyback programs |Enabling the app for a user. This permission should be enabled for everyone who is allowed to use the app (e.g. Member state) | `basic_access`
+Can setup corporation | Add or updates the character for syncing offices and contracts. This should be limited to users with admins / leadership privileges. | `setup_retriever`
+Can manage buyback programs | User with this permission can manage the buyback programs and view the cumulative statistics | `manage_programs`
+
+### Setup corp
 
 Finally you need to set a corporation with the character that will be used for fetching the corporation offices, contracts and related structures. Just click on **Setup Corp** and add the requested token.
 
@@ -102,7 +108,7 @@ Finally you need to set a corporation with the character that will be used for f
 
 > Note that the respective character needs to be a director for the corporation.
 
-### 8. Define programs
+### Define programs
 
 Let's say your corp has an ORE buyback program and you want to use this tool for that. First, you need to click on **Create Program** and fill the name of the program.
 
@@ -114,7 +120,7 @@ You should also be able to add all the items and the percentage the corp skims o
 
 That's it. The buybacks program is fully created and ready to be used.
 
-### 9. Calculating
+### Calculating
 
 Any character can use one of the buyback programs by clicking on **Use this program** button on one of the program. Once done, they need to select the location and can copy-paste the items they want to send to the corp. When they click on **Calculate**, the app calculates the exact amount based on the prices defined in the program and shows them that total value.
 
@@ -139,12 +145,7 @@ python manage.py collectstatic
 
 Finally restart your AA supervisor services.
 
-## Permissions
+## TODO
 
-This is an overview of all permissions used by this app:
-
-Name | Purpose | Code
--- | -- | --
-Can access this app and view buyback programs |Enabling the app for a user. This permission should be enabled for everyone who is allowed to use the app (e.g. Member state) | `basic_access`
-Can setup corporation | Add or updates the character for syncing offices and contracts. This should be limited to users with admins / leadership privileges. | `setup_retriever`
-Can manage buyback programs | User with this permission can manage the buyback programs and view the cumulative statistics | `manage_programs`
+* Use refined value to calculate OREs
+* Statistics viewing and filtering

@@ -8,6 +8,7 @@ from allianceauth.authentication.models import CharacterOwnership
 from allianceauth.eveonline.models import EveCorporationInfo, EveCharacter
 from eveuniverse.models import EveType
 from django.db import transaction
+from django.db.models import F
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy
 from django.shortcuts import redirect, render
@@ -204,7 +205,9 @@ def program_add_item(request, program_pk):
     if request.method != 'POST':
         form = ProgramItemForm()
     else:
-        form = ProgramItemForm(request.POST)
+        form = ProgramItemForm(
+            request.POST, value=int(request.POST['item_type']),
+        )
 
         if form.is_valid():
             item_type = form.cleaned_data['item_type']
@@ -454,6 +457,8 @@ def item_autocomplete(request):
     if q is not None:
         items = items.filter(name__contains=q)
 
-    items = items.values('id', 'name')
+    items = items.annotate(
+        value=F('id'), text=F('name'),
+    ).values('value', 'text')
 
     return JsonResponse(list(items), safe=False)

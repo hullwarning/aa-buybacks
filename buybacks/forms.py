@@ -16,7 +16,7 @@ class ProgramItemForm(forms.Form):
     item_type = forms.ModelChoiceField(
         queryset=EveType.objects.none(),
         label="Item type",
-        help_text="Add the item type which is accepted in this buyback program",
+        help_text="Add the name of item which is accepted in this buyback program. Once you start typing, we offer suggestions",
         empty_label=None,
     )
     brokerage = forms.IntegerField(
@@ -28,6 +28,16 @@ class ProgramItemForm(forms.Form):
         label="Calculate value using the refined end product (only works for ore)",
         required=False,
     )
+
+    def __init__(self, *args, **kwargs):
+        value = kwargs.pop('value', None)
+
+        super(ProgramItemForm, self).__init__(*args, **kwargs)
+
+        if value is not None:
+            self.fields['item_type'].queryset = EveType.objects.filter(
+                pk=value, published=True,
+            ).exclude(eve_group__eve_category__id=9)
 
 
 class ProgramLocationForm(forms.Form):
