@@ -22,60 +22,20 @@ class Command(BaseCommand):
             __title__,
             "--category_id",
             str(EVE_CATEGORY_ID_MATERIAL),
-        )
-
-        call_command(
-            "eveuniverse_load_types",
-            __title__,
             "--category_id",
             str(EVE_CATEGORY_ID_SHIP),
-        )
-
-        call_command(
-            "eveuniverse_load_types",
-            __title__,
             "--category_id",
             str(EVE_CATEGORY_ID_MODULE),
-        )
-
-        call_command(
-            "eveuniverse_load_types",
-            __title__,
             "--category_id",
             str(EVE_CATEGORY_ID_CHARGE),
-        )
-
-        call_command(
-            "eveuniverse_load_types",
-            __title__,
             "--category_id",
             str(EVE_CATEGORY_ID_COMMODITY),
-        )
-
-        call_command(
-            "eveuniverse_load_types",
-            __title__,
             "--category_id",
             str(EVE_CATEGORY_ID_DRONE),
-        )
-
-        call_command(
-            "eveuniverse_load_types",
-            __title__,
             "--category_id",
             str(EVE_CATEGORY_ID_ASTEROID),
-        )
-
-        call_command(
-            "eveuniverse_load_types",
-            __title__,
             "--category_id",
             str(EVE_CATEGORY_ID_PLANETRAY_COMMODITY),
-        )
-
-        call_command(
-            "eveuniverse_load_types",
-            __title__,
             "--category_id",
             str(EVE_CATEGORY_ID_FIGHTER),
         )
