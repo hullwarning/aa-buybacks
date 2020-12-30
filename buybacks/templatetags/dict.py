@@ -11,7 +11,7 @@ def lookup(dictionary, key):
 
 @register.filter
 def not_empty(dictionary):
-    return len(dictionary.keys()) is not 0
+    return len(dictionary.keys()) != 0
 
 
 @register.filter
