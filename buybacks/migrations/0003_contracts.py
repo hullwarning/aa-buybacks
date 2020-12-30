@@ -4,94 +4,94 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('buybacks', '0002_programs'),
+        ("buybacks", "0002_programs"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Notification',
+            name="Notification",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.AutoField(
                         auto_created=True,
                         primary_key=True,
                         serialize=False,
-                        verbose_name='ID',
+                        verbose_name="ID",
                     ),
                 ),
                 (
-                    'program_location',
+                    "program_location",
                     models.ForeignKey(
                         on_delete=models.deletion.CASCADE,
-                        related_name='+',
-                        to='buybacks.programlocation',
+                        related_name="+",
+                        to="buybacks.programlocation",
                     ),
                 ),
                 (
-                    'user',
+                    "user",
                     models.ForeignKey(
                         on_delete=models.deletion.CASCADE,
-                        related_name='+',
-                        to='auth.user',
-                    )
+                        related_name="+",
+                        to="auth.user",
+                    ),
                 ),
                 (
-                    'total',
+                    "total",
                     models.PositiveBigIntegerField(
-                        help_text='Total value of contract',
+                        help_text="Total value of contract",
                     ),
                 ),
                 (
-                    'items',
+                    "items",
                     models.TextField(
-                        help_text='JSON dump of item data',
+                        help_text="JSON dump of item data",
                     ),
                 ),
             ],
             options={
-                'default_permissions': (),
+                "default_permissions": (),
             },
         ),
         migrations.CreateModel(
-            name='Contract',
+            name="Contract",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.PositiveBigIntegerField(
                         primary_key=True,
                         serialize=False,
                     ),
                 ),
                 (
-                    'program',
+                    "program",
                     models.ForeignKey(
                         on_delete=models.deletion.CASCADE,
-                        related_name='+',
-                        to='buybacks.program',
+                        related_name="+",
+                        to="buybacks.program",
                     ),
                 ),
                 (
-                    'character',
+                    "character",
                     models.ForeignKey(
                         on_delete=models.deletion.CASCADE,
-                        related_name='+',
-                        to='authentication.characterownership',
-                    )
+                        related_name="+",
+                        to="authentication.characterownership",
+                    ),
                 ),
                 (
-                    'total',
+                    "total",
                     models.PositiveBigIntegerField(
-                        help_text='Total value of contract',
+                        help_text="Total value of contract",
                     ),
                 ),
                 (
-                    'date',
+                    "date",
                     models.DateTimeField(),
                 ),
             ],
             options={
-                'default_permissions': (),
+                "default_permissions": (),
             },
         ),
     ]

@@ -1,7 +1,7 @@
 from django import forms
 from eveuniverse.models import EveType
 
-from .models import Office, ProgramLocation, Program
+from .models import Office, ProgramLocation
 from .validators import validate_brokerage
 
 
@@ -12,12 +12,12 @@ class ProgramForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        program = kwargs.pop('program', None)
+        program = kwargs.pop("program", None)
 
         super(ProgramForm, self).__init__(*args, **kwargs)
 
         if program is not None:
-            self.fields['name'].initial = program.name
+            self.fields["name"].initial = program.name
 
 
 class ProgramItemForm(forms.Form):
@@ -38,13 +38,14 @@ class ProgramItemForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        value = kwargs.pop('value', None)
+        value = kwargs.pop("value", None)
 
         super(ProgramItemForm, self).__init__(*args, **kwargs)
 
         if value is not None:
-            self.fields['item_type'].queryset = EveType.objects.filter(
-                pk=value, published=True,
+            self.fields["item_type"].queryset = EveType.objects.filter(
+                pk=value,
+                published=True,
             ).exclude(eve_group__eve_category__id=9)
 
 
@@ -57,11 +58,11 @@ class ProgramLocationForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        program = kwargs.pop('program', None)
+        program = kwargs.pop("program", None)
 
         super(ProgramLocationForm, self).__init__(*args, **kwargs)
 
-        self.fields['office'].queryset = Office.objects.filter(
+        self.fields["office"].queryset = Office.objects.filter(
             corporation=program.corporation,
         )
 
@@ -80,10 +81,10 @@ class CalculatorForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        program = kwargs.pop('program', None)
+        program = kwargs.pop("program", None)
 
         super(CalculatorForm, self).__init__(*args, **kwargs)
 
-        self.fields['office'].queryset = ProgramLocation.objects.filter(
+        self.fields["office"].queryset = ProgramLocation.objects.filter(
             program=program,
         )

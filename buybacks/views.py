@@ -17,7 +17,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 
 from .helpers import evemarketer
-from .models import Corporation, Program, ProgramItem, ProgramLocation, Notification, Contract
+from .models import (
+    Corporation,
+    Program,
+    ProgramItem,
+    ProgramLocation,
+    Notification,
+    Contract,
+)
 from .utils import messages_plus
 from .tasks import update_offices_for_corp
 from .forms import ProgramForm, ProgramItemForm, ProgramLocationForm, CalculatorForm
@@ -27,17 +34,15 @@ ADD_PROGRAM_TOKEN_TAG = "buybacks_add_program_token"
 
 
 @login_required
-@permission_required('buybacks.basic_access')
+@permission_required("buybacks.basic_access")
 def index(request):
-    context = {
-        'programs': Program.objects.filter()
-    }
+    context = {"programs": Program.objects.filter()}
 
-    return render(request, 'buybacks/index.html', context)
+    return render(request, "buybacks/index.html", context)
 
 
 @login_required
-@permission_required('buybacks.basic_access')
+@permission_required("buybacks.basic_access")
 def my_notifications(request):
     notifications = Notification.objects.filter(
         user=request.user,
@@ -52,66 +57,65 @@ def my_notifications(request):
         for type_id in data:
             typeids.add(type_id)
 
-    types = EveType.objects.filter(
-        pk__in=typeids
-    )
+    types = EveType.objects.filter(pk__in=typeids)
 
     for item in types:
         items[str(item.id)] = item.name
 
     context = {
-        'bb_notifications': notifications,
-        'items': items,
-        'remove_url': 'buybacks:notification_remove',
-        'show_user': False,
+        "bb_notifications": notifications,
+        "items": items,
+        "remove_url": "buybacks:notification_remove",
+        "show_user": False,
     }
 
-    return render(request, 'buybacks/notifications.html', context)
+    return render(request, "buybacks/notifications.html", context)
 
 
 @login_required
-@permission_required('buybacks.basic_access')
+@permission_required("buybacks.basic_access")
 def my_stats(request):
     contracts = Contract.objects.filter(
         character__user=request.user,
     )
 
     context = {
-        'contracts': contracts,
-        'show_user': False,
+        "contracts": contracts,
+        "show_user": False,
     }
 
-    return render(request, 'buybacks/stats.html', context)
+    return render(request, "buybacks/stats.html", context)
 
 
 @login_required
-@permission_required('buybacks.manage_programs')
+@permission_required("buybacks.manage_programs")
 def program_stats(request, program_pk):
     contracts = Contract.objects.filter(
         program__pk=program_pk,
     )
 
     context = {
-        'contracts': contracts,
-        'show_user': True,
+        "contracts": contracts,
+        "show_user": True,
     }
 
-    return render(request, 'buybacks/stats.html', context)
+    return render(request, "buybacks/stats.html", context)
 
 
 @login_required
-@permission_required('buybacks.basic_access')
+@permission_required("buybacks.basic_access")
 def notification_remove(request, notification_pk, program_pk):
     Notification.objects.filter(
-        pk=notification_pk, user=request.user,
+        pk=notification_pk,
+        user=request.user,
         program_location__program__id=program_pk,
     ).delete()
 
-    return redirect('buybacks:my_notifications')
+    return redirect("buybacks:my_notifications")
 
 
 @login_required
-@permission_required('buybacks.manage_programs')
+@permission_required("buybacks.manage_programs")
 def program_notifications(request, program_pk):
     notifications = Notification.objects.filter(
         program_location__program__id=program_pk,
@@ -126,54 +130,52 @@ def program_notifications(request, program_pk):
         for type_id in data:
             typeids.add(type_id)
 
-    types = EveType.objects.filter(
-        pk__in=typeids
-    )
+    types = EveType.objects.filter(pk__in=typeids)
 
     for item in types:
         items[str(item.id)] = item.name
 
     context = {
-        'bb_notifications': notifications,
-        'items': items,
-        'remove_url': 'buybacks:program_notification_remove',
-        'show_user': True,
+        "bb_notifications": notifications,
+        "items": items,
+        "remove_url": "buybacks:program_notification_remove",
+        "show_user": True,
     }
 
-    return render(request, 'buybacks/notifications.html', context)
+    return render(request, "buybacks/notifications.html", context)
 
 
 @login_required
-@permission_required('buybacks.manage_programs')
+@permission_required("buybacks.manage_programs")
 def program_notification_remove(request, notification_pk, program_pk):
     Notification.objects.filter(
         pk=notification_pk,
         program_location__program__id=program_pk,
     ).delete()
 
-    return redirect('buybacks:program_notifications', program_pk=program_pk)
+    return redirect("buybacks:program_notifications", program_pk=program_pk)
 
 
 @login_required
-@permission_required('buybacks.basic_access')
+@permission_required("buybacks.basic_access")
 def program(request, program_pk):
     program = Program.objects.filter(pk=program_pk).first()
 
     if program is None:
-        return redirect('buybacks:index')
+        return redirect("buybacks:index")
 
     context = {
-        'program': program,
-        'items': ProgramItem.objects.filter(program=program),
-        'locations': ProgramLocation.objects.filter(program=program),
-        'corporation': program.corporation.corporation,
+        "program": program,
+        "items": ProgramItem.objects.filter(program=program),
+        "locations": ProgramLocation.objects.filter(program=program),
+        "corporation": program.corporation.corporation,
     }
 
-    return render(request, 'buybacks/program.html', context)
+    return render(request, "buybacks/program.html", context)
 
 
 @login_required
-@permission_required('buybacks.basic_access')
+@permission_required("buybacks.basic_access")
 def program_calculate(request, program_pk):
     program = Program.objects.filter(pk=program_pk).first()
     data = {}
@@ -183,27 +185,28 @@ def program_calculate(request, program_pk):
     total = 0
 
     if program is None:
-        return redirect('buybacks:index')
+        return redirect("buybacks:index")
 
-    if request.method != 'POST':
+    if request.method != "POST":
         form = CalculatorForm(program=program)
     else:
         form = CalculatorForm(request.POST, program=program)
 
         if form.is_valid():
-            office = form.cleaned_data['office']
-            items = form.cleaned_data['items']
+            office = form.cleaned_data["office"]
+            items = form.cleaned_data["items"]
 
             program_location = ProgramLocation.objects.filter(
-                program=program, office__location__name=office,
+                program=program,
+                office__location__name=office,
             ).first()
 
-            for item in items.split('\n'):
-                parts = item.split('\t')
+            for item in items.split("\n"):
+                parts = item.split("\t")
 
                 if len(parts) >= 2:
                     name = parts[0]
-                    quantity = int(parts[1].replace(',', ''))
+                    quantity = int(parts[1].replace(",", ""))
 
                     if name in data:
                         data[name] += quantity
@@ -224,8 +227,12 @@ def program_calculate(request, program_pk):
             prices = evemarketer(typeids.values())
 
             for name in brokerages:
-                item_value = (100 - brokerages[name]) / 100 * \
-                    data[name] * prices[typeids[name]]['buy']
+                item_value = (
+                    (100 - brokerages[name])
+                    / 100
+                    * data[name]
+                    * prices[typeids[name]]["buy"]
+                )
 
                 value[name] = item_value
                 total += item_value
@@ -233,51 +240,51 @@ def program_calculate(request, program_pk):
             total = math.ceil(total)
 
     context = {
-        'program': program,
-        'corporation': program.corporation.corporation,
-        'form': form,
-        'data': data,
-        'value': value,
-        'typeids': typeids,
-        'total': total,
-        'program_location': program_location,
+        "program": program,
+        "corporation": program.corporation.corporation,
+        "form": form,
+        "data": data,
+        "value": value,
+        "typeids": typeids,
+        "total": total,
+        "program_location": program_location,
     }
 
-    return render(request, 'buybacks/program_calculate.html', context)
+    return render(request, "buybacks/program_calculate.html", context)
 
 
 @csrf_exempt
 @login_required
-@permission_required('buybacks.basic_access')
+@permission_required("buybacks.basic_access")
 def program_notify(request, program_pk):
     program = Program.objects.filter(pk=program_pk).first()
 
-    if request.method != 'POST' or program is None:
-        return HttpResponseBadRequest('')
+    if request.method != "POST" or program is None:
+        return HttpResponseBadRequest("")
 
     data = json.loads(request.body)
 
     program_location = ProgramLocation.objects.filter(
-        program=program, id=data['program_location']
+        program=program, id=data["program_location"]
     ).first()
 
     if program_location is None:
-        return HttpResponseBadRequest('')
+        return HttpResponseBadRequest("")
 
     notification = Notification.objects.create(
         program_location=program_location,
         user=request.user,
-        total=data['total'],
-        items=json.dumps(data['items']),
+        total=data["total"],
+        items=json.dumps(data["items"]),
     )
 
     if notification is None:
-        return HttpResponseBadRequest('')
+        return HttpResponseBadRequest("")
     else:
         messages_plus.success(
             request,
             format_html(
-                'Created a notification for buyback program <strong>{}</strong>',
+                "Created a notification for buyback program <strong>{}</strong>",
                 program.name,
             ),
         )
@@ -286,60 +293,63 @@ def program_notify(request, program_pk):
 
 
 @login_required
-@permission_required('buybacks.manage_programs')
+@permission_required("buybacks.manage_programs")
 def program_remove(request, program_pk):
     Program.objects.filter(pk=program_pk).delete()
 
-    return redirect('buybacks:index')
+    return redirect("buybacks:index")
 
 
 @login_required
-@permission_required('buybacks.manage_programs')
+@permission_required("buybacks.manage_programs")
 def program_remove_item(request, program_pk, item_type_pk):
     ProgramItem.objects.filter(
-        program=program_pk, item_type=item_type_pk,
+        program=program_pk,
+        item_type=item_type_pk,
     ).delete()
 
-    return redirect('buybacks:program', program_pk=program_pk)
+    return redirect("buybacks:program", program_pk=program_pk)
 
 
 @login_required
-@permission_required('buybacks.manage_programs')
+@permission_required("buybacks.manage_programs")
 def program_remove_location(request, program_pk, office_pk):
     ProgramLocation.objects.filter(
-        program=program_pk, office=office_pk,
+        program=program_pk,
+        office=office_pk,
     ).delete()
 
-    return redirect('buybacks:program', program_pk=program_pk)
+    return redirect("buybacks:program", program_pk=program_pk)
 
 
 @login_required
-@permission_required('buybacks.manage_programs')
+@permission_required("buybacks.manage_programs")
 def program_add_item(request, program_pk):
     program = Program.objects.filter(pk=program_pk).first()
 
     if program is None:
-        return redirect('buybacks:index')
+        return redirect("buybacks:index")
 
-    if request.method != 'POST':
+    if request.method != "POST":
         form = ProgramItemForm()
     else:
         form = ProgramItemForm(
-            request.POST, value=int(request.POST['item_type']),
+            request.POST,
+            value=int(request.POST["item_type"]),
         )
 
         if form.is_valid():
-            item_type = form.cleaned_data['item_type']
-            brokerage = form.cleaned_data['brokerage']
-            use_refined_value = form.cleaned_data['use_refined_value']
+            item_type = form.cleaned_data["item_type"]
+            brokerage = form.cleaned_data["brokerage"]
+            use_refined_value = form.cleaned_data["use_refined_value"]
 
             try:
                 _, created = ProgramItem.objects.update_or_create(
                     item_type=item_type,
                     program=program,
                     defaults={
-                        'brokerage': brokerage,
-                        'use_refined_value': use_refined_value,
+                        "brokerage": brokerage,
+                        "use_refined_value": use_refined_value,
                     },
                 )
 
@@ -347,43 +357,44 @@ def program_add_item(request, program_pk):
                     messages_plus.success(
                         request,
                         format_html(
-                            'Added <strong>{}</strong> to <strong>{}</strong>',
-                            item_type, program.name,
+                            "Added <strong>{}</strong> to <strong>{}</strong>",
+                            item_type,
+                            program.name,
                         ),
                     )
 
-                return redirect('buybacks:program', program_pk=program.id)
+                return redirect("buybacks:program", program_pk=program.id)
 
             except Exception:
                 messages_plus.error(
                     request,
-                    'Failed to add item to buyback program',
+                    "Failed to add item to buyback program",
                 )
 
     context = {
-        'program': program,
-        'corporation': program.corporation.corporation,
-        'form': form,
+        "program": program,
+        "corporation": program.corporation.corporation,
+        "form": form,
     }
 
-    return render(request, 'buybacks/program_add_item.html', context)
+    return render(request, "buybacks/program_add_item.html", context)
 
 
 @login_required
-@permission_required('buybacks.manage_programs')
+@permission_required("buybacks.manage_programs")
 def program_add_location(request, program_pk):
     program = Program.objects.filter(pk=program_pk).first()
 
     if program is None:
-        return redirect('buybacks:index')
+        return redirect("buybacks:index")
 
-    if request.method != 'POST':
+    if request.method != "POST":
         form = ProgramLocationForm(program=program)
     else:
         form = ProgramLocationForm(request.POST, program=program)
 
         if form.is_valid():
-            office = form.cleaned_data['office']
+            office = form.cleaned_data["office"]
 
             try:
                 _, created = ProgramLocation.objects.update_or_create(
@@ -394,42 +405,43 @@ def program_add_location(request, program_pk):
                     messages_plus.success(
                         request,
                         format_html(
-                            'Added <strong>{}</strong> to <strong>{}</strong>',
-                            office, program.name,
+                            "Added <strong>{}</strong> to <strong>{}</strong>",
+                            office,
+                            program.name,
                         ),
                     )
 
-                return redirect('buybacks:program', program_pk=program.id)
+                return redirect("buybacks:program", program_pk=program.id)
 
             except Exception:
                 messages_plus.error(
                     request,
-                    'Failed to add location to buyback program',
+                    "Failed to add location to buyback program",
                 )
 
     context = {
-        'program': program,
-        'corporation': program.corporation.corporation,
-        'form': form,
+        "program": program,
+        "corporation": program.corporation.corporation,
+        "form": form,
     }
 
-    return render(request, 'buybacks/program_add_location.html', context)
+    return render(request, "buybacks/program_add_location.html", context)
 
 
 @login_required
 @token_required(
     scopes=[
-        'publicData',
+        "publicData",
     ]
 )
-@permission_required('buybacks.manage_programs')
+@permission_required("buybacks.manage_programs")
 def program_add(request, token):
     request.session[ADD_PROGRAM_TOKEN_TAG] = token.pk
     return redirect("buybacks:program_add_2")
 
 
 @login_required
-@permission_required('buybacks.manage_programs')
+@permission_required("buybacks.manage_programs")
 def program_add_2(request):
     if ADD_PROGRAM_TOKEN_TAG not in request.session:
         raise RuntimeError("Missing token in session")
@@ -440,9 +452,7 @@ def program_add_2(request):
     token_char = EveCharacter.objects.get(character_id=token.character_id)
 
     try:
-        corporation = Corporation.objects.get(
-            corporation=token_char.corporation
-        )
+        corporation = Corporation.objects.get(corporation=token_char.corporation)
     except (Corporation.DoesNotExist, EveCorporationInfo.DoesNotExist):
         messages_plus.error(
             request,
@@ -456,97 +466,98 @@ def program_add_2(request):
         success = False
 
     if success:
-        if request.method != 'POST':
+        if request.method != "POST":
             form = ProgramForm()
         else:
             form = ProgramForm(request.POST)
 
             if form.is_valid():
-                name = form.cleaned_data['name']
+                name = form.cleaned_data["name"]
 
                 try:
-                    program = Program.objects.create(
-                        name=name, corporation=corporation
-                    )
+                    program = Program.objects.create(name=name, corporation=corporation)
                     messages_plus.success(
                         request,
                         format_html(
-                            'Created buyback program <strong>{}</strong>',
+                            "Created buyback program <strong>{}</strong>",
                             program.name,
                         ),
                     )
-                    return redirect('buybacks:program', program_pk=program.id)
+                    return redirect("buybacks:program", program_pk=program.id)
 
                 except Exception:
                     messages_plus.error(
                         request,
-                        'Failed to create buyback program',
+                        "Failed to create buyback program",
                     )
 
         context = {
-            'corporation': corporation.corporation,
-            'form': form,
-            'to': reverse('buybacks:program_add_2'),
-            'action': 'Create',
+            "corporation": corporation.corporation,
+            "form": form,
+            "to": reverse("buybacks:program_add_2"),
+            "action": "Create",
         }
 
-        return render(request, 'buybacks/program_add.html', context)
+        return render(request, "buybacks/program_add.html", context)
 
-    return redirect('buybacks:index')
+    return redirect("buybacks:index")
 
 
 @login_required
-@permission_required('buybacks.manage_programs')
+@permission_required("buybacks.manage_programs")
 def program_edit(request, program_pk):
     program = Program.objects.filter(pk=program_pk).first()
 
     if program is None:
-        return redirect('buybacks:index')
+        return redirect("buybacks:index")
 
-    if request.method != 'POST':
+    if request.method != "POST":
         form = ProgramForm(program=program)
     else:
         form = ProgramForm(request.POST, program=program)
 
         if form.is_valid():
-            program.name = form.cleaned_data['name']
+            program.name = form.cleaned_data["name"]
 
             try:
                 program.save()
                 messages_plus.success(
                     request,
                     format_html(
-                        'Edited buyback program <strong>{}</strong>',
+                        "Edited buyback program <strong>{}</strong>",
                         program.name,
                     ),
                 )
-                return redirect('buybacks:program', program_pk=program.id)
+                return redirect("buybacks:program", program_pk=program.id)
 
             except Exception:
                 messages_plus.error(
                     request,
-                    'Failed to edit buyback program',
+                    "Failed to edit buyback program",
                 )
 
     context = {
-        'corporation': program.corporation.corporation,
-        'form': form,
-        'to': reverse('buybacks:program_edit', kwargs={
-            'program_pk': program_pk,
-        }),
-        'action': 'Edit',
+        "corporation": program.corporation.corporation,
+        "form": form,
+        "to": reverse(
+            "buybacks:program_edit",
+            kwargs={
+                "program_pk": program_pk,
+            },
+        ),
+        "action": "Edit",
     }
 
-    return render(request, 'buybacks/program_add.html', context)
+    return render(request, "buybacks/program_add.html", context)
 
 
 @login_required
-@permission_required('buybacks.setup_retriever')
+@permission_required("buybacks.setup_retriever")
 @token_required(
     scopes=[
-        'esi-universe.read_structures.v1',
-        'esi-assets.read_corporation_assets.v1',
-        'esi-contracts.read_corporation_contracts.v1',
+        "esi-universe.read_structures.v1",
+        "esi-assets.read_corporation_assets.v1",
+        "esi-contracts.read_corporation_contracts.v1",
     ]
 )
 def setup(request, token):
@@ -612,19 +623,20 @@ def setup(request, token):
 
 
 @login_required
-@permission_required('buybacks.manage_programs')
+@permission_required("buybacks.manage_programs")
 def item_autocomplete(request):
     items = EveType.objects.filter(published=True).exclude(
         eve_group__eve_category__id=9
     )
 
-    q = request.GET.get('q', None)
+    q = request.GET.get("q", None)
 
     if q is not None:
         items = items.filter(name__contains=q)
 
     items = items.annotate(
-        value=F('id'), text=F('name'),
-    ).values('value', 'text')
+        value=F("id"),
+        text=F("name"),
+    ).values("value", "text")
 
     return JsonResponse(list(items), safe=False)
