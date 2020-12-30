@@ -5,7 +5,7 @@ from bravado.exception import HTTPUnauthorized, HTTPForbidden
 from eveuniverse.models import EveSolarSystem
 
 from . import __title__
-from .utils import LoggerAddTag, make_logger_prefix
+from .utils import LoggerAddTag
 from .helpers import esi_fetch
 
 
@@ -40,15 +40,12 @@ class LocationManager(models.Manager):
         """updates or creates location object with data fetched from ESI"""
         from .models import Location
 
-        add_prefix = make_logger_prefix(location_id)
-
         if location_id >= self.STATION_ID_START and location_id <= self.STATION_ID_END:
-            logger.info(add_prefix("Fetching station from ESI"))
+            logger.info("Fetching station from ESI")
             try:
                 station = esi_fetch(
                     "Universe.get_universe_stations_station_id",
                     args={"station_id": location_id},
-                    logger_tag=add_prefix(),
                 )
 
                 eve_solar_system, _ = EveSolarSystem.objects.get_or_create_esi(
@@ -64,8 +61,7 @@ class LocationManager(models.Manager):
                     },
                 )
             except Exception as ex:
-                logger.exception(add_prefix(
-                    "Failed to load station: {}".format(ex)))
+                logger.exception("Failed to load station: {}".format(ex))
                 raise ex
         else:
             try:
@@ -73,7 +69,6 @@ class LocationManager(models.Manager):
                     "Universe.get_universe_structures_structure_id",
                     args={"structure_id": location_id},
                     token=token,
-                    logger_tag=add_prefix(),
                 )
 
                 eve_solar_system, _ = EveSolarSystem.objects.get_or_create_esi(
@@ -89,8 +84,7 @@ class LocationManager(models.Manager):
                     },
                 )
             except (HTTPUnauthorized, HTTPForbidden) as ex:
-                logger.warn(add_prefix(
-                    "No access to this structure: {}".format(ex)))
+                logger.warning("No access to this structure: {}".format(ex))
                 if add_unknown:
                     location, created = self.get_or_create(
                         id=location_id,
@@ -102,8 +96,7 @@ class LocationManager(models.Manager):
                 else:
                     raise ex
             except Exception as ex:
-                logger.exception(add_prefix(
-                    "Failed to load structure: {}".format(ex)))
+                logger.exception("Failed to load structure: {}".format(ex))
                 raise ex
 
         return location, created
