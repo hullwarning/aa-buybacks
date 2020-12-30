@@ -1,7 +1,7 @@
 from django import forms
 from eveuniverse.models import EveType
 
-from .models import Office, ProgramLocation
+from .models import Office, ProgramLocation, Program
 from .validators import validate_brokerage
 
 
@@ -10,6 +10,14 @@ class ProgramForm(forms.Form):
         label="Program Name",
         help_text="Give your buyback program a name to easily identify it",
     )
+
+    def __init__(self, *args, **kwargs):
+        program = kwargs.pop('program', None)
+
+        super(ProgramForm, self).__init__(*args, **kwargs)
+
+        if program is not None:
+            self.fields['name'].initial = program.name
 
 
 class ProgramItemForm(forms.Form):

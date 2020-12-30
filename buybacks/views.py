@@ -14,6 +14,7 @@ from django.utils.translation import gettext_lazy
 from django.shortcuts import redirect, render
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
 
 from .helpers import evemarketer
 from .models import Corporation, Program, ProgramItem, ProgramLocation, Notification
@@ -455,11 +456,58 @@ def program_add_2(request):
         context = {
             'corporation': corporation.corporation,
             'form': form,
+            'to': reverse('buybacks:program_add_2'),
+            'action': 'Create',
         }
 
         return render(request, 'buybacks/program_add.html', context)
 
     return redirect('buybacks:index')
+
+
+@login_required
+@permission_required('buybacks.manage_programs')
+def program_edit(request, program_pk):
+    program = Program.objects.filter(pk=program_pk).first()
+
+    if program is None:
+        return redirect('buybacks:index')
+
+    if request.method != 'POST':
+        form = ProgramForm(program=program)
+    else:
+        form = ProgramForm(request.POST, program=program)
+
+        if form.is_valid():
+            program.name = form.cleaned_data['name']
+
+            try:
+                program.save()
+                messages_plus.success(
+                    request,
+                    format_html(
+                        'Edited buyback program <strong>{}</strong>',
+                        program.name,
+                    ),
+                )
+                return redirect('buybacks:program', program_pk=program.id)
+
+            except Exception:
+                messages_plus.error(
+                    request,
+                    'Failed to edit buyback program',
+                )
+
+    context = {
+        'corporation': program.corporation.corporation,
+        'form': form,
+        'to': reverse('buybacks:program_edit', kwargs={
+            'program_pk': program_pk,
+        }),
+        'action': 'Edit',
+    }
+
+    return render(request, 'buybacks/program_add.html', context)
 
 
 @login_required

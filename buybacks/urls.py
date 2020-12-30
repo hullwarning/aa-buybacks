@@ -27,6 +27,12 @@ urlpatterns = [
     path('program_add_2', views.program_add_2, name='program_add_2'),
 
     url(
+        r'^program/(?P<program_pk>[0-9]+)/edit$',
+        views.program_edit,
+        name='program_edit',
+    ),
+
+    url(
         r'^program/(?P<program_pk>[0-9]+)$',
         views.program,
         name='program',

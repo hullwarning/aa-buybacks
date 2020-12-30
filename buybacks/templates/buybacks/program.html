@@ -10,6 +10,9 @@
 
 {% if perms.buybacks.manage_programs %}
 <div class="pull-right">
+  <a class="btn btn-sm btn-warning" href="{% url 'buybacks:program_edit' program_pk=program.id %}">
+    Edit name
+  </a>
   <a class="btn btn-sm btn-success" href="{% url 'buybacks:program_add_item' program_pk=program.id %}">
     Add item & price
   </a>

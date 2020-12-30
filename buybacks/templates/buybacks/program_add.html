@@ -4,10 +4,10 @@
 {% load bootstrap %}
 
 {% block body %}
-<form class="form" action="{% url 'buybacks:program_add_2' %}" method="POST">
+<form class="form" action="{{ url }}" method="POST">
   {% csrf_token %}
   {{ form|bootstrap }}
-  <button type="submit" class="btn btn-primary">Create</button>
+  <button type="submit" class="btn btn-primary">{{ action }}</button>
 </form>
 {% endblock %}
 
