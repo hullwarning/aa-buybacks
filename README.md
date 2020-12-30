@@ -110,7 +110,7 @@ Finally you need to set a corporation with the character that will be used for f
 
 > Note that only users with the appropriate permission will be able to see and use this button.
 
-> Note that the respective character needs to be a director for the corporation.
+> Note that the respective character needs to be a **director** for the corporation.
 
 ### Define programs
 
@@ -126,11 +126,11 @@ That's it. The buybacks program is fully created and ready to be used.
 
 ### Calculating
 
-Any character can use one of the buyback programs by clicking on **Use this program** button on one of the program. Once done, they need to select the location and can copy-paste the items they want to send to the corp. When they click on **Calculate**, the app calculates the exact amount based on the prices defined in the program and shows them that total value.
+Any character can use one of the buyback programs by clicking on **Use** button on one of the program. Once done, they need to select the location and can copy-paste the items they want to send to the corp. When they click on **Calculate**, the app calculates the exact amount based on the prices defined in the program and shows them that total value.
 
 Once they see the total value, they would need to send an in-game contract for the exact amount and then click on **Notify** to notify the app about it.
 
-Once the corp accepts a contract, our contracts sync feature would automatically match the corresponding notification and store it in the statistics.
+Once the corp accepts a contract, our contracts sync feature would automatically match the corresponding notification (based on the total price, items with quantities and the location of the contract) and store it in the statistics.
 
 ## Updating
 
@@ -157,4 +157,4 @@ Finally restart your AA supervisor services.
 
 * Use refined value to calculate OREs
 * Set refining percentage per item
-* Statistics viewing and filtering
+* Statistics filtering

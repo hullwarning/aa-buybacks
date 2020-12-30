@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 
 from .helpers import evemarketer
-from .models import Corporation, Program, ProgramItem, ProgramLocation, Notification
+from .models import Corporation, Program, ProgramItem, ProgramLocation, Notification, Contract
 from .utils import messages_plus
 from .tasks import update_offices_for_corp
 from .forms import ProgramForm, ProgramItemForm, ProgramLocationForm, CalculatorForm
@@ -67,6 +67,36 @@ def my_notifications(request):
     }
 
     return render(request, 'buybacks/notifications.html', context)
+
+
+@login_required
+@permission_required('buybacks.basic_access')
+def my_stats(request):
+    contracts = Contract.objects.filter(
+        character__user=request.user,
+    )
+
+    context = {
+        'contracts': contracts,
+        'show_user': False,
+    }
+
+    return render(request, 'buybacks/stats.html', context)
+
+
+@login_required
+@permission_required('buybacks.manage_programs')
+def program_stats(request, program_pk):
+    contracts = Contract.objects.filter(
+        program__pk=program_pk,
+    )
+
+    context = {
+        'contracts': contracts,
+        'show_user': True,
+    }
+
+    return render(request, 'buybacks/stats.html', context)
 
 
 @login_required

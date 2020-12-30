@@ -10,6 +10,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('setup', views.setup, name='setup'),
     path('my_notifications', views.my_notifications, name='my_notifications'),
+    path('my_stats', views.my_stats, name='my_stats'),
 
     url(
         r'^notification/(?P<notification_pk>[0-9]+)/(?P<program_pk>[0-9]+)$',
@@ -41,6 +42,12 @@ urlpatterns = [
         r'^program/(?P<program_pk>[0-9]+)/remove$',
         views.program_remove,
         name='program_remove',
+    ),
+
+    url(
+        r'^program/(?P<program_pk>[0-9]+)/stats$',
+        views.program_stats,
+        name='program_stats',
     ),
 
     url(

@@ -19,7 +19,7 @@
                 <td style="line-height: 35px;">{{ program.corporation.corporation }}</td>
                 <td class="text-center">
                     <a class="btn btn-success btn-sm" href="{% url 'buybacks:program_calculate' program_pk=program.id %}">
-                        Use this program
+                        Use
                     </a>
                     <a class="btn btn-primary btn-sm" href="{% url 'buybacks:program' program_pk=program.id %}">
                         View
@@ -27,6 +27,9 @@
                     {% if perms.buybacks.manage_programs %}
                     <a class="btn btn-info btn-sm" href="{% url 'buybacks:program_notifications' program_pk=program.id %}">
                         Notifications
+                    </a>
+                    <a class="btn btn-warning btn-sm" href="{% url 'buybacks:program_stats' program_pk=program.id %}">
+                        Stats
                     </a>
                     <a class="btn btn-danger btn-sm" href="{% url 'buybacks:program_remove' program_pk=program.id %}">
                         Delete

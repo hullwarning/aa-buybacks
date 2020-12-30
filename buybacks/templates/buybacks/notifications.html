@@ -52,6 +52,10 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+
+                        <div style="text-align: center; margin-top: 20px;">
+                            <p class="text-muted">Total Contract Value: <span class="text-primary" id="total">{{ notification.total|format_number:0 }}</span> ISK</p>
+                        </div>
                     </div>
                 </td>
             </tr>
