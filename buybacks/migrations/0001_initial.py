@@ -8,136 +8,136 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('eveuniverse', '0004_effect_longer_name'),
-        ('authentication', '0017_remove_fleetup_permission'),
-        ('eveonline', '0012_index_additions'),
+        ("eveuniverse", "0004_effect_longer_name"),
+        ("authentication", "0017_remove_fleetup_permission"),
+        ("eveonline", "0012_index_additions"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Buybacks',
+            name="Buybacks",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.AutoField(
                         auto_created=True,
                         primary_key=True,
                         serialize=False,
-                        verbose_name='ID'
+                        verbose_name="ID",
                     ),
                 ),
             ],
             options={
-                'permissions': (
-                    ('basic_access', 'Can access this app'),
-                    ('setup_retriever', 'Can setup information retriever'),
-                    ('manage_programs', 'Can manage buyback programs'),
+                "permissions": (
+                    ("basic_access", "Can access this app"),
+                    ("setup_retriever", "Can setup information retriever"),
+                    ("manage_programs", "Can manage buyback programs"),
                 ),
-                'managed': False,
-                'default_permissions': (),
+                "managed": False,
+                "default_permissions": (),
             },
         ),
         migrations.CreateModel(
-            name='Corporation',
+            name="Corporation",
             fields=[
                 (
-                    'corporation',
+                    "corporation",
                     models.OneToOneField(
                         primary_key=True,
                         on_delete=models.deletion.CASCADE,
-                        related_name='+',
-                        to='eveonline.evecorporationinfo',
+                        related_name="+",
+                        to="eveonline.evecorporationinfo",
                     ),
                 ),
                 (
-                    'character',
+                    "character",
                     models.ForeignKey(
-                        help_text='Character used for retrieving info',
+                        help_text="Character used for retrieving info",
                         on_delete=models.deletion.PROTECT,
-                        related_name='+',
-                        to='authentication.characterownership',
+                        related_name="+",
+                        to="authentication.characterownership",
                     ),
                 ),
             ],
             options={
-                'default_permissions': (),
+                "default_permissions": (),
             },
         ),
         migrations.CreateModel(
-            name='Location',
+            name="Location",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.PositiveBigIntegerField(
-                        help_text='Eve Online location ID',
+                        help_text="Eve Online location ID",
                         primary_key=True,
                         serialize=False,
                     ),
                 ),
                 (
-                    'name',
+                    "name",
                     models.CharField(
-                        help_text='In-game name of this station or structure',
+                        help_text="In-game name of this station or structure",
                         max_length=100,
                     ),
                 ),
                 (
-                    'eve_solar_system',
+                    "eve_solar_system",
                     models.ForeignKey(
                         blank=True,
                         default=None,
                         null=True,
                         on_delete=models.deletion.SET_DEFAULT,
-                        related_name='+',
-                        to='eveuniverse.evesolarsystem',
+                        related_name="+",
+                        to="eveuniverse.evesolarsystem",
                     ),
                 ),
                 (
-                    'category_id',
+                    "category_id",
                     models.IntegerField(
                         choices=[
-                            (3, 'station'),
-                            (65, 'structure'),
-                            (0, '(unknown)'),
+                            (3, "station"),
+                            (65, "structure"),
+                            (0, "(unknown)"),
                         ],
                         default=0,
                     ),
                 ),
             ],
             options={
-                'default_permissions': (),
+                "default_permissions": (),
             },
         ),
         migrations.CreateModel(
-            name='Office',
+            name="Office",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.PositiveBigIntegerField(
-                        help_text='Item ID of the office',
+                        help_text="Item ID of the office",
                         primary_key=True,
                         serialize=False,
                     ),
                 ),
                 (
-                    'corporation',
+                    "corporation",
                     models.ForeignKey(
                         on_delete=models.deletion.CASCADE,
-                        related_name='+',
-                        to='buybacks.corporation',
+                        related_name="+",
+                        to="buybacks.corporation",
                     ),
                 ),
                 (
-                    'location',
+                    "location",
                     models.ForeignKey(
                         on_delete=models.deletion.CASCADE,
-                        related_name='+',
-                        to='buybacks.location',
+                        related_name="+",
+                        to="buybacks.location",
                     ),
                 ),
             ],
             options={
-                'default_permissions': (),
+                "default_permissions": (),
             },
         ),
     ]
