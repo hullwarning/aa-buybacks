@@ -2,14 +2,14 @@ $(function () {
   $("#notify").on("click", function () {
     var items = {};
 
-    $("#value tr").each(function () {
+    $("#value tbody tr").each(function () {
       var id = $(this).find("td").eq(0).attr("data-type-id");
       var quantity = $(this).find("td").eq(1).text();
 
-      items[id] = parseInt(quantity.replaceAll(",", ""), 10);
+      items[id] = parseInt(quantity.replace(/,/g, ""), 10);
     });
 
-    var total = parseInt($("#total").text().replaceAll(",", ""), 10);
+    var total = parseInt($("#total").text().replace(/,/g, ""), 10);
 
     var program_location = $(this).attr("data-program-location");
     var url = $(this).attr("data-url");

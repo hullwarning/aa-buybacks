@@ -84,7 +84,7 @@ def program_calculate(request, program_pk):
 
                 if len(parts) >= 2:
                     name = parts[0]
-                    quantity = int(parts[1])
+                    quantity = int(parts[1].replace(',', ''))
 
                     if name in data:
                         data[name] += quantity

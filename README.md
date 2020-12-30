@@ -20,7 +20,8 @@ This is a buyback program management app for [Alliance Auth](https://gitlab.com/
    8. [Define programs](#define-programs)
    9. [Calculating](#calculating)
 3. [Updating](#updating)
-4. [TODO](#todo)
+4. [Tips & Tricks](#tips--tricks)
+5. [TODO](#todo)
 
 <!-- omit in toc -->
 ## Overview
@@ -129,7 +130,7 @@ Any character can use one of the buyback programs by clicking on **Use this prog
 
 Once they see the total value, they would need to send an in-game contract for the exact amount and then click on **Notify** to notify the app about it.
 
-Once the corp accepts the contract, our contracts sync feature would automatically match the notification and store it in the statistics.
+Once the corp accepts a contract, our contracts sync feature would automatically match the corresponding notification and store it in the statistics.
 
 ## Updating
 
@@ -148,7 +149,14 @@ python manage.py collectstatic
 
 Finally restart your AA supervisor services.
 
+## Tips & Tricks
+
+* If you want to edit the brokerage of an item in a program, you can just add the item with the new brokerage and it will update the existing one.
+
 ## TODO
 
 * Use refined value to calculate OREs
+* Set refining percentage per item
+* Notifications viewing and deleting
+* Program name edit
 * Statistics viewing and filtering
