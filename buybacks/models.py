@@ -59,6 +59,7 @@ class Corporation(models.Model):
     )
     character = models.ForeignKey(
         CharacterOwnership,
+        help_text="Character used for retrieving info",
         on_delete=models.deletion.PROTECT,
         related_name="+",
     )
@@ -230,16 +231,17 @@ class Corporation(models.Model):
 class Location(models.Model):
     """An Eve Online buyback location: station or Upwell structure"""
 
-    CATEGORY_UNKNOWN_ID = 0
     CATEGORY_STATION_ID = 3
     CATEGORY_STRUCTURE_ID = 65
+    CATEGORY_UNKNOWN_ID = 0
     CATEGORY_CHOICES = [
         (CATEGORY_STATION_ID, "station"),
         (CATEGORY_STRUCTURE_ID, "structure"),
         (CATEGORY_UNKNOWN_ID, "(unknown)"),
     ]
 
-    id = models.BigIntegerField(
+    id = models.PositiveBigIntegerField(
+        help_text="Eve Online location ID",
         primary_key=True,
     )
     name = models.CharField(
@@ -253,12 +255,15 @@ class Location(models.Model):
         on_delete=models.deletion.SET_DEFAULT,
         related_name="+",
     )
-    category_id = models.PositiveIntegerField(
+    category_id = models.IntegerField(
         choices=CATEGORY_CHOICES,
         default=CATEGORY_UNKNOWN_ID,
     )
 
     objects = LocationManager()
+
+    class Meta:
+        default_permissions = ()
 
     def __str__(self):
         return self.name
@@ -284,8 +289,9 @@ class Location(models.Model):
 class Office(models.Model):
     """An Eve Online buyback office for a corp: station or Upwell structure"""
 
-    id = models.BigIntegerField(
+    id = models.PositiveBigIntegerField(
         primary_key=True,
+        help_text="Item ID of the office",
     )
     corporation = models.ForeignKey(
         Corporation,
@@ -298,6 +304,9 @@ class Office(models.Model):
         related_name="+",
     )
 
+    class Meta:
+        default_permissions = ()
+
     def __str__(self):
         return self.location.name
 
@@ -306,7 +315,9 @@ class Program(models.Model):
     """An Eve Online buyback program for a corp"""
 
     id = models.AutoField(
+        auto_created=True,
         primary_key=True,
+        verbose_name="ID",
     )
     corporation = models.ForeignKey(
         Corporation,
@@ -317,12 +328,17 @@ class Program(models.Model):
         max_length=100,
     )
 
+    class Meta:
+        default_permissions = ()
+
 
 class ProgramItem(models.Model):
     """Items in the buyback program for a corp"""
 
     id = models.AutoField(
+        auto_created=True,
         primary_key=True,
+        verbose_name="ID",
     )
     program = models.ForeignKey(
         Program,
@@ -334,17 +350,16 @@ class ProgramItem(models.Model):
         on_delete=models.deletion.CASCADE,
         related_name="+",
     )
-    brokerage = models.PositiveIntegerField(
+    brokerage = models.IntegerField(
         help_text="Jita max buy - x%",
         validators=[validate_brokerage],
     )
     use_refined_value = models.BooleanField(
-        blank=True,
-        default=None,
-        null=True,
+        help_text="If ore, calculate on top of refined value",
     )
 
     class Meta:
+        default_permissions = ()
         unique_together = ["program", "item_type"]
 
 
@@ -352,7 +367,9 @@ class ProgramLocation(models.Model):
     """Locations for buyback program for a corp"""
 
     id = models.AutoField(
+        auto_created=True,
         primary_key=True,
+        verbose_name="ID",
     )
     program = models.ForeignKey(
         Program,
@@ -369,6 +386,7 @@ class ProgramLocation(models.Model):
         return self.office.location.name
 
     class Meta:
+        default_permissions = ()
         unique_together = ["program", "office"]
 
 
@@ -376,7 +394,9 @@ class Notification(models.Model):
     """Notifiaction by user that he is sending contract"""
 
     id = models.AutoField(
+        auto_created=True,
         primary_key=True,
+        verbose_name="ID",
     )
     program_location = models.ForeignKey(
         ProgramLocation,
@@ -388,8 +408,15 @@ class Notification(models.Model):
         on_delete=models.deletion.CASCADE,
         related_name="+",
     )
-    total = models.PositiveBigIntegerField()
-    items = models.TextField()
+    total = models.PositiveBigIntegerField(
+        help_text="Total value of contract",
+    )
+    items = models.TextField(
+        help_text="JSON dump of item data",
+    )
+
+    class Meta:
+        default_permissions = ()
 
 
 class Contract(models.Model):
@@ -408,5 +435,10 @@ class Contract(models.Model):
         on_delete=models.deletion.CASCADE,
         related_name="+",
     )
-    total = models.PositiveBigIntegerField()
+    total = models.PositiveBigIntegerField(
+        help_text="Total value of contract",
+    )
     date = models.DateTimeField()
+
+    class Meta:
+        default_permissions = ()
