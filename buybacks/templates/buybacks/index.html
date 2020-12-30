@@ -7,9 +7,9 @@
     <table style="width: 100%; margin: auto;" class="table table-striped table-condensed">
         <thead>
             <tr>
-                <th style="width: 50%;">{% trans "Buyback Program Name" %}</th>
+                <th style="width: 45%;">{% trans "Buyback Program Name" %}</th>
                 <th style="width: 20%;">{% trans "Corporation" %}</th>
-                <th class="text-center" style="width: 30%;">{% trans "Actions" %}</th>
+                <th class="text-center" style="width: 35%;">{% trans "Actions" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -25,6 +25,9 @@
                         View
                     </a>
                     {% if perms.buybacks.manage_programs %}
+                    <a class="btn btn-info btn-sm" href="{% url 'buybacks:program_notifications' program_pk=program.id %}">
+                        Notifications
+                    </a>
                     <a class="btn btn-danger btn-sm" href="{% url 'buybacks:program_remove' program_pk=program.id %}">
                         Delete
                     </a>

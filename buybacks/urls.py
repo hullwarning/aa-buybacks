@@ -9,6 +9,13 @@ app_name = 'buybacks'
 urlpatterns = [
     path('', views.index, name='index'),
     path('setup', views.setup, name='setup'),
+    path('my_notifications', views.my_notifications, name='my_notifications'),
+
+    url(
+        r'^notification/(?P<notification_pk>[0-9]+)/(?P<program_pk>[0-9]+)$',
+        views.notification_remove,
+        name='notification_remove',
+    ),
 
     url(
         r'^item_autocomplete/$',
@@ -20,7 +27,7 @@ urlpatterns = [
     path('program_add_2', views.program_add_2, name='program_add_2'),
 
     url(
-        r'^program/(?P<program_pk>[0-9]+)/$',
+        r'^program/(?P<program_pk>[0-9]+)$',
         views.program,
         name='program',
     ),
@@ -28,6 +35,17 @@ urlpatterns = [
         r'^program/(?P<program_pk>[0-9]+)/remove$',
         views.program_remove,
         name='program_remove',
+    ),
+
+    url(
+        r'^program/(?P<program_pk>[0-9]+)/notifications$',
+        views.program_notifications,
+        name='program_notifications',
+    ),
+    url(
+        r'^program/(?P<program_pk>[0-9]+)/notification_remove/(?P<notification_pk>[0-9]+)$',
+        views.program_notification_remove,
+        name='program_notification_remove',
     ),
 
     url(

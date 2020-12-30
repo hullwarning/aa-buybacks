@@ -157,6 +157,5 @@ Finally restart your AA supervisor services.
 
 * Use refined value to calculate OREs
 * Set refining percentage per item
-* Notifications viewing and deleting
 * Program name edit
 * Statistics viewing and filtering

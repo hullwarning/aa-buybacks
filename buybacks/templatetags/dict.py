@@ -1,4 +1,5 @@
 from django import template
+from json import loads
 
 register = template.Library()
 
@@ -11,3 +12,13 @@ def lookup(dictionary, key):
 @register.filter
 def not_empty(dictionary):
     return len(dictionary.keys()) is not 0
+
+
+@register.filter
+def entries(dictionary):
+    return dictionary.items()
+
+
+@register.filter
+def json(text):
+    return loads(text)

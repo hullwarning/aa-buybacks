@@ -37,6 +37,94 @@ def index(request):
 
 @login_required
 @permission_required('buybacks.basic_access')
+def my_notifications(request):
+    notifications = Notification.objects.filter(
+        user=request.user,
+    )
+
+    typeids = set()
+    items = {}
+
+    for notification in notifications:
+        data = json.loads(notification.items)
+
+        for type_id in data:
+            typeids.add(type_id)
+
+    types = EveType.objects.filter(
+        pk__in=typeids
+    )
+
+    for item in types:
+        items[str(item.id)] = item.name
+
+    context = {
+        'bb_notifications': notifications,
+        'items': items,
+        'remove_url': 'buybacks:notification_remove',
+        'show_user': False,
+    }
+
+    return render(request, 'buybacks/notifications.html', context)
+
+
+@login_required
+@permission_required('buybacks.basic_access')
+def notification_remove(request, notification_pk, program_pk):
+    Notification.objects.filter(
+        pk=notification_pk, user=request.user,
+        program_location__program__id=program_pk,
+    ).delete()
+
+    return redirect('buybacks:my_notifications')
+
+
+@login_required
+@permission_required('buybacks.manage_programs')
+def program_notifications(request, program_pk):
+    notifications = Notification.objects.filter(
+        program_location__program__id=program_pk,
+    )
+
+    typeids = set()
+    items = {}
+
+    for notification in notifications:
+        data = json.loads(notification.items)
+
+        for type_id in data:
+            typeids.add(type_id)
+
+    types = EveType.objects.filter(
+        pk__in=typeids
+    )
+
+    for item in types:
+        items[str(item.id)] = item.name
+
+    context = {
+        'bb_notifications': notifications,
+        'items': items,
+        'remove_url': 'buybacks:program_notification_remove',
+        'show_user': True,
+    }
+
+    return render(request, 'buybacks/notifications.html', context)
+
+
+@login_required
+@permission_required('buybacks.manage_programs')
+def program_notification_remove(request, notification_pk, program_pk):
+    Notification.objects.filter(
+        pk=notification_pk,
+        program_location__program__id=program_pk,
+    ).delete()
+
+    return redirect('buybacks:program_notifications', program_pk=program_pk)
+
+
+@login_required
+@permission_required('buybacks.basic_access')
 def program(request, program_pk):
     program = Program.objects.filter(pk=program_pk).first()
 
