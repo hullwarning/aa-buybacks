@@ -30,9 +30,9 @@ class Buybacks(models.Model):
         managed = False
         default_permissions = ()
         permissions = (
-            ('basic_access', 'Can access this app'),
-            ('setup_retriever', 'Can setup information retriever'),
-            ('manage_programs', 'Can manage buyback programs'),
+            ("basic_access", "Can access this app"),
+            ("setup_retriever", "Can setup information retriever"),
+            ("manage_programs", "Can manage buyback programs"),
         )
 
 
@@ -69,51 +69,49 @@ class Corporation(models.Model):
     def sync_contracts_esi(self):
         token = self.token(
             [
-                'esi-contracts.read_corporation_contracts.v1',
+                "esi-contracts.read_corporation_contracts.v1",
             ]
         )[0]
 
         contracts = esi_fetch(
-            'Contracts.get_corporations_corporation_id_contracts',
+            "Contracts.get_corporations_corporation_id_contracts",
             args={
-                'corporation_id': self.corporation.corporation_id,
+                "corporation_id": self.corporation.corporation_id,
             },
             has_pages=True,
             token=token,
-            logger_tag=self._logger_prefix(),
         )
 
         buybacks = [
             x
             for x in contracts
-            if x['type'] == 'item_exchange'
-            and x['status'] == 'finished'
-            and int(x['assignee_id']) == self.corporation.corporation_id
+            if x["type"] == "item_exchange"
+            and x["status"] == "finished"
+            and int(x["assignee_id"]) == self.corporation.corporation_id
         ]
 
         for contract in buybacks:
             notification = Notification.objects.filter(
-                program_location__office__location__id=contract['start_location_id'],
-                total=contract['price'],
+                program_location__office__location__id=contract["start_location_id"],
+                total=contract["price"],
             ).first()
 
             if notification is not None:
                 items = esi_fetch(
-                    'Contracts.get_corporations_corporation_id_contracts_contract_id_items',
+                    "Contracts.get_corporations_corporation_id_contracts_contract_id_items",
                     args={
-                        'corporation_id': self.corporation.corporation_id,
-                        'contract_id': contract['contract_id'],
+                        "corporation_id": self.corporation.corporation_id,
+                        "contract_id": contract["contract_id"],
                     },
                     token=token,
-                    logger_tag=self._logger_prefix(),
                 )
 
                 quantities = {}
 
                 for item in items:
-                    if item['is_included']:
-                        type_id = int(item['type_id'])
-                        quantity = int(item['quantity'])
+                    if item["is_included"]:
+                        type_id = int(item["type_id"])
+                        quantity = int(item["quantity"])
 
                         if type_id in quantities:
                             quantities[type_id] += quantity
@@ -126,12 +124,15 @@ class Corporation(models.Model):
                 for type_id in data:
                     type_id = int(type_id)
 
-                    if type_id not in quantities or quantities[type_id] != data[str(type_id)]:
+                    if (
+                        type_id not in quantities
+                        or quantities[type_id] != data[str(type_id)]
+                    ):
                         match = False
 
                 if match:
                     character = CharacterOwnership.objects.filter(
-                        character__character_id=contract['issuer_id']
+                        character__character_id=contract["issuer_id"]
                     ).first()
 
                     if character is not None:
@@ -140,45 +141,42 @@ class Corporation(models.Model):
                         ).delete()
 
                         Contract.objects.create(
-                            id=contract['contract_id'],
+                            id=contract["contract_id"],
                             program=notification.program_location.program,
                             character=character,
-                            total=contract['price'],
-                            date=contract['date_issued'],
+                            total=contract["price"],
+                            date=contract["date_issued"],
                         )
 
     def update_offices_esi(self):
         token = self.token(
             [
-                'esi-universe.read_structures.v1',
-                'esi-assets.read_corporation_assets.v1',
+                "esi-universe.read_structures.v1",
+                "esi-assets.read_corporation_assets.v1",
             ]
         )[0]
 
         assets = esi_fetch(
-            'Assets.get_corporations_corporation_id_assets',
+            "Assets.get_corporations_corporation_id_assets",
             args={
-                'corporation_id': self.corporation.corporation_id,
+                "corporation_id": self.corporation.corporation_id,
             },
             has_pages=True,
             token=token,
-            logger_tag=self._logger_prefix(),
         )
 
         office_ids_to_remove = list(
-            Office.objects.filter(
-                corporation=self
-            ).values_list('id', flat=True)
+            Office.objects.filter(corporation=self).values_list("id", flat=True)
         )
 
         for asset in assets:
-            if asset['type_id'] == OFFICE_TYPE_ID:
+            if asset["type_id"] == OFFICE_TYPE_ID:
                 location = Location.objects.get_or_create_from_esi(
-                    location_id=asset['location_id'],
+                    location_id=asset["location_id"],
                     token=token,
                 )[0]
 
-                office_id = asset['item_id']
+                office_id = asset["item_id"]
                 office = Office.objects.filter(pk=office_id).first()
 
                 if office is not None:
@@ -196,7 +194,6 @@ class Corporation(models.Model):
         """returns a valid Token for the character"""
         token = None
         error = None
-        add_prefix = self._logger_prefix()
 
         try:
             # get token
@@ -210,15 +207,14 @@ class Corporation(models.Model):
                 .first()
             )
         except TokenInvalidError:
-            logger.error(add_prefix("Invalid token for fetching information"))
+            logger.error("Invalid token for fetching information")
             error = self.ERROR_TOKEN_INVALID
         except TokenExpiredError:
-            logger.error(add_prefix("Token expired for fetching information"))
+            logger.error("Token expired for fetching information")
             error = self.ERROR_TOKEN_EXPIRED
         else:
             if not token:
-                logger.error(add_prefix(
-                    "No token found with sufficient scopes"))
+                logger.error("No token found with sufficient scopes")
                 error = self.ERROR_TOKEN_INVALID
 
         return token, error
@@ -247,8 +243,7 @@ class Location(models.Model):
         primary_key=True,
     )
     name = models.CharField(
-        max_length=100,
-        help_text="In-game name of this station or structure"
+        max_length=100, help_text="In-game name of this station or structure"
     )
     eve_solar_system = models.ForeignKey(
         EveSolarSystem,
@@ -316,7 +311,7 @@ class Program(models.Model):
     corporation = models.ForeignKey(
         Corporation,
         on_delete=models.deletion.CASCADE,
-        related_name='+',
+        related_name="+",
     )
     name = models.CharField(
         max_length=100,
@@ -332,15 +327,15 @@ class ProgramItem(models.Model):
     program = models.ForeignKey(
         Program,
         on_delete=models.deletion.CASCADE,
-        related_name='+',
+        related_name="+",
     )
     item_type = models.ForeignKey(
         EveType,
         on_delete=models.deletion.CASCADE,
-        related_name='+',
+        related_name="+",
     )
     brokerage = models.PositiveIntegerField(
-        help_text='Jita max buy - x%',
+        help_text="Jita max buy - x%",
         validators=[validate_brokerage],
     )
     use_refined_value = models.BooleanField(
@@ -350,7 +345,7 @@ class ProgramItem(models.Model):
     )
 
     class Meta:
-        unique_together = ['program', 'item_type']
+        unique_together = ["program", "item_type"]
 
 
 class ProgramLocation(models.Model):
@@ -362,19 +357,19 @@ class ProgramLocation(models.Model):
     program = models.ForeignKey(
         Program,
         on_delete=models.deletion.CASCADE,
-        related_name='+',
+        related_name="+",
     )
     office = models.ForeignKey(
         Office,
         on_delete=models.deletion.CASCADE,
-        related_name='+',
+        related_name="+",
     )
 
     def __str__(self):
         return self.office.location.name
 
     class Meta:
-        unique_together = ['program', 'office']
+        unique_together = ["program", "office"]
 
 
 class Notification(models.Model):
@@ -386,12 +381,12 @@ class Notification(models.Model):
     program_location = models.ForeignKey(
         ProgramLocation,
         on_delete=models.deletion.CASCADE,
-        related_name='+',
+        related_name="+",
     )
     user = models.ForeignKey(
         User,
         on_delete=models.deletion.CASCADE,
-        related_name='+',
+        related_name="+",
     )
     total = models.PositiveBigIntegerField()
     items = models.TextField()
@@ -406,12 +401,12 @@ class Contract(models.Model):
     program = models.ForeignKey(
         Program,
         on_delete=models.deletion.CASCADE,
-        related_name='+',
+        related_name="+",
     )
     character = models.ForeignKey(
         CharacterOwnership,
         on_delete=models.deletion.CASCADE,
-        related_name='+',
+        related_name="+",
     )
     total = models.PositiveBigIntegerField()
     date = models.DateTimeField()

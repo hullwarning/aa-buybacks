@@ -5,13 +5,22 @@ from django.utils.html import format_html
 
 
 class LoggerAddTag(logging.LoggerAdapter):
-    """add custom tag to a logger"""
+    """
+    add custom tag to a logger
+    """
 
     def __init__(self, my_logger, prefix):
-        super(LoggerAddTag, self).__init__(my_logger, {})
+        super().__init__(my_logger, {})
         self.prefix = prefix
 
     def process(self, msg, kwargs):
+        """
+        process log items
+        :param msg:
+        :param kwargs:
+        :return:
+        """
+
         return "[%s] %s" % (self.prefix, msg), kwargs
 
 
@@ -58,8 +67,7 @@ class messages_plus:
         fail_silently: bool = False,
     ):
         messages.debug(
-            request, cls._add_messages_icon(
-                DEBUG, message), extra_tags, fail_silently
+            request, cls._add_messages_icon(DEBUG, message), extra_tags, fail_silently
         )
 
     @classmethod
@@ -71,8 +79,7 @@ class messages_plus:
         fail_silently: bool = False,
     ):
         messages.info(
-            request, cls._add_messages_icon(
-                INFO, message), extra_tags, fail_silently
+            request, cls._add_messages_icon(INFO, message), extra_tags, fail_silently
         )
 
     @classmethod
@@ -84,8 +91,7 @@ class messages_plus:
         fail_silently: bool = False,
     ):
         messages.success(
-            request, cls._add_messages_icon(
-                SUCCESS, message), extra_tags, fail_silently
+            request, cls._add_messages_icon(SUCCESS, message), extra_tags, fail_silently
         )
 
     @classmethod
@@ -97,8 +103,7 @@ class messages_plus:
         fail_silently: bool = False,
     ):
         messages.warning(
-            request, cls._add_messages_icon(
-                WARNING, message), extra_tags, fail_silently
+            request, cls._add_messages_icon(WARNING, message), extra_tags, fail_silently
         )
 
     @classmethod
@@ -110,6 +115,5 @@ class messages_plus:
         fail_silently: bool = False,
     ):
         messages.error(
-            request, cls._add_messages_icon(
-                ERROR, message), extra_tags, fail_silently
+            request, cls._add_messages_icon(ERROR, message), extra_tags, fail_silently
         )

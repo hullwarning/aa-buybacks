@@ -15,7 +15,7 @@ from esi.clients import esi_client_factory
 from esi.models import Token
 
 from . import __title__
-from .utils import LoggerAddTag, make_logger_prefix
+from .utils import LoggerAddTag
 
 
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)
@@ -33,10 +33,10 @@ def evemarketer(
         return {}
 
     response = requests.get(
-        'https://api.evemarketer.com/ec/marketstat/json',
+        "https://api.evemarketer.com/ec/marketstat/json",
         params={
-            'typeid': ','.join([str(x) for x in typeids]),
-            'regionlimit': 10000002,
+            "typeid": ",".join([str(x) for x in typeids]),
+            "regionlimit": 10000002,
         },
     )
 
@@ -44,11 +44,11 @@ def evemarketer(
     result = {}
 
     for item in items:
-        id = item['buy']['forQuery']['types'][0]
+        id = item["buy"]["forQuery"]["types"][0]
 
         result[id] = {
-            'buy': item['buy']['max'],
-            'sell': item['sell']['min'],
+            "buy": item["buy"]["max"],
+            "sell": item["sell"]["min"],
         }
 
     return result
@@ -60,7 +60,6 @@ def esi_fetch(
     has_pages: bool = False,
     token: Token = None,
     esi_client: object = None,
-    logger_tag: str = None,
 ) -> dict:
     """returns an response object from ESI, will retry on some HTTP errors.
     will automatically return all pages if requested
@@ -73,7 +72,6 @@ def esi_fetch(
     - token: esi token from django-esi to be used with request
     - esi_client: esi client object from django-esi to be used for request
     instead of default esi client from this module
-    - logger_tag: every log message will start with this text in brackets
     """
     _, request_object = _fetch_main(
         esi_path=esi_path,
@@ -82,7 +80,6 @@ def esi_fetch(
         has_pages=has_pages,
         esi_client=esi_client,
         token=token,
-        logger_tag=logger_tag,
     ).popitem()
     return request_object
 
@@ -94,7 +91,6 @@ def esi_fetch_with_localization(
     has_pages: bool = False,
     esi_client: object = None,
     token: Token = None,
-    logger_tag: str = None,
 ) -> dict:
     """returns dict of response objects from ESI
     will contain one full object items for each language if supported or just one
@@ -111,7 +107,6 @@ def esi_fetch_with_localization(
     - token: esi token from django-esi to be used with request
     - esi_client: esi client object from django-esi to be used for request
     instead of default esi client from this module
-    - logger_tag: every log message will start with this text in brackets
     """
     return _fetch_main(
         esi_path=esi_path,
@@ -120,7 +115,6 @@ def esi_fetch_with_localization(
         has_pages=has_pages,
         esi_client=esi_client,
         token=token,
-        logger_tag=logger_tag,
     )
 
 
@@ -131,7 +125,6 @@ def _fetch_main(
     has_pages: bool,
     esi_client: object,
     token: Token,
-    logger_tag: str,
 ) -> dict:
     """returns dict of response objects from ESI with localization"""
 
@@ -154,7 +147,6 @@ def _fetch_main(
             has_pages=has_pages,
             esi_client=esi_client,
             token=token,
-            logger_tag=logger_tag,
         )
 
     return response_objects
@@ -166,7 +158,6 @@ def _fetch_with_paging(
     has_pages: bool = False,
     esi_client: object = None,
     token: Token = None,
-    logger_tag: str = None,
 ) -> dict:
     """fetches esi objects incl. all pages if requested and returns them"""
     response_object, pages = _fetch_with_retries(
@@ -175,7 +166,6 @@ def _fetch_with_paging(
         has_pages=has_pages,
         esi_client=esi_client,
         token=token,
-        logger_tag=logger_tag,
     )
     if has_pages:
         for page in range(2, pages + 1):
@@ -187,7 +177,6 @@ def _fetch_with_paging(
                 pages=pages,
                 esi_client=esi_client,
                 token=token,
-                logger_tag=logger_tag,
             )
             response_object += response_object_page
 
@@ -213,7 +202,6 @@ def _fetch_with_retries(
     pages: int = None,
     esi_client: object = None,
     token: Token = None,
-    logger_tag: str = None,
 ) -> tuple:
     """Returns response object and pages from ESI, retries on 502s"""
 
@@ -231,7 +219,6 @@ def _fetch_with_retries(
         esi_method_name=esi_method_name,
         args=args,
         has_pages=has_pages,
-        logger_tag=logger_tag,
         log_message_base=log_message_base,
     )
     return response_object, pages
@@ -267,8 +254,7 @@ def _prepare_esi_request(
         if not page:
             page = 1
         args["page"] = page
-        log_message_base += " - Page {}/{}".format(
-            page, pages if pages else "?")
+        log_message_base += " - Page {}/{}".format(page, pages if pages else "?")
     if token:
         if token.expired:
             token.refresh()
@@ -282,22 +268,18 @@ def _execute_esi_request(
     esi_method_name: str,
     args: dict,
     has_pages: bool,
-    logger_tag: str,
     log_message_base: str,
 ):
     """make request to ESI
 
     returns request object and total number of pages to retrieve
     """
-    add_prefix = make_logger_prefix(logger_tag)
-    logger.info(add_prefix(log_message_base))
+    logger.info(log_message_base)
     for retry_count in range(ESI_MAX_RETRIES + 1):
         if retry_count > 0:
-            logger.warn(
-                add_prefix(
-                    "{} - Retry {} / {}".format(
-                        log_message_base, retry_count, ESI_MAX_RETRIES
-                    )
+            logger.warning(
+                "{} - Retry {} / {}".format(
+                    log_message_base, retry_count, ESI_MAX_RETRIES
                 )
             )
         try:
@@ -328,20 +310,13 @@ def _execute_esi_request(
             break
 
         except (HTTPBadGateway, HTTPGatewayTimeout, HTTPServiceUnavailable) as ex:
-            logger.warn(
-                add_prefix(
-                    "HTTP error while trying to "
-                    "fetch response_object from ESI: {}".format(ex)
-                )
+            logger.warning(
+                "HTTP error while trying to "
+                "fetch response_object from ESI: {}".format(ex)
             )
             if retry_count < ESI_MAX_RETRIES:
                 sleep_seconds = (ESI_RETRY_SLEEP_SECS * retry_count) ** 2
-                logger.info(
-                    add_prefix(
-                        "Waiting {} seconds until next retry".format(
-                            sleep_seconds)
-                    )
-                )
+                logger.info("Waiting {} seconds until next retry".format(sleep_seconds))
                 sleep(sleep_seconds)
             else:
                 raise ex
