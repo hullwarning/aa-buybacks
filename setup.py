@@ -21,6 +21,7 @@ setup(
     description="Buyback program management app for Alliance Auth",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    url="https://gitlab.com/pksunkara/aa-buybacks",
     author="Pavan Kumar Sunkara",
     author_email="pavan.sss1991@gmail.com",
     classifiers=[
