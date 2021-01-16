@@ -9,17 +9,17 @@ app_name = "buybacks"
 urlpatterns = [
     path("", views.index, name="index"),
     path("setup", views.setup, name="setup"),
+    url(
+        r"^item_autocomplete/$",
+        views.item_autocomplete,
+        name="item_autocomplete",
+    ),
     path("my_notifications", views.my_notifications, name="my_notifications"),
     path("my_stats", views.my_stats, name="my_stats"),
     url(
         r"^notification/(?P<notification_pk>[0-9]+)/(?P<program_pk>[0-9]+)$",
         views.notification_remove,
         name="notification_remove",
-    ),
-    url(
-        r"^item_autocomplete/$",
-        views.item_autocomplete,
-        name="item_autocomplete",
     ),
     path("program_add", views.program_add, name="program_add"),
     path("program_add_2", views.program_add_2, name="program_add_2"),
