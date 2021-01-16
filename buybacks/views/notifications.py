@@ -75,7 +75,6 @@ def my_notifications(request):
     context = {
         "bb_notifications": notifications,
         "items": items,
-        "remove_url": "buybacks:notification_remove",
         "mine": True,
     }
 
@@ -84,25 +83,23 @@ def my_notifications(request):
 
 @login_required
 @permission_required("buybacks.basic_access")
-def notification_remove(request, notification_pk, program_pk):
-    Notification.objects.filter(
-        pk=notification_pk,
-        user=request.user,
-        program_location__program__id=program_pk,
-    ).delete()
+def notification_remove(request, notification_pk):
+    mine = request.GET.get("mine", "True") == "True"
+
+    notification = Notification.objects.filter(pk=notification_pk)
+
+    if mine:
+        notification.filter(user=request.user).delete()
+    elif request.user.has_perm("buybacks.manage_programs"):
+        notification = notification.first()
+        notification.delete()
+
+        return redirect(
+            "buybacks:program_notifications",
+            program_pk=notification.program_location.program.id,
+        )
 
     return redirect("buybacks:my_notifications")
-
-
-@login_required
-@permission_required("buybacks.manage_programs")
-def program_notification_remove(request, notification_pk, program_pk):
-    Notification.objects.filter(
-        pk=notification_pk,
-        program_location__program__id=program_pk,
-    ).delete()
-
-    return redirect("buybacks:program_notifications", program_pk=program_pk)
 
 
 @login_required
@@ -129,7 +126,6 @@ def program_notifications(request, program_pk):
     context = {
         "bb_notifications": notifications,
         "items": items,
-        "remove_url": "buybacks:program_notification_remove",
         "mine": False,
     }
 

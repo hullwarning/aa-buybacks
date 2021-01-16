@@ -31,7 +31,7 @@
                 <td style="line-height: 35px;">{{ notification.program_location.office }}</td>
                 {% if mine or perms.buybacks.manage_programs %}
                 <td>
-                    <a class="btn btn-sm btn-danger" href="{% url remove_url notification_pk=notification.id program_pk=notification.program_location.program.id %}">
+                    <a class="btn btn-sm btn-danger" href="{% url 'buybacks:notification_remove' notification_pk=notification.id %}?mine={{ mine }}">
                         Delete
                     </a>
                 </td>

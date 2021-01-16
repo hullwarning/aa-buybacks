@@ -17,7 +17,7 @@ urlpatterns = [
     path("my_notifications", views.my_notifications, name="my_notifications"),
     path("my_stats", views.my_stats, name="my_stats"),
     url(
-        r"^notification/(?P<notification_pk>[0-9]+)/(?P<program_pk>[0-9]+)$",
+        r"^notification/(?P<notification_pk>[0-9]+)/remove$",
         views.notification_remove,
         name="notification_remove",
     ),
@@ -39,29 +39,24 @@ urlpatterns = [
         name="program_remove",
     ),
     url(
-        r"^program/(?P<program_pk>[0-9]+)/stats$",
-        views.program_stats,
-        name="program_stats",
-    ),
-    url(
-        r"^program/(?P<program_pk>[0-9]+)/notifications$",
-        views.program_notifications,
-        name="program_notifications",
-    ),
-    url(
-        r"^program/(?P<program_pk>[0-9]+)/notification_remove/(?P<notification_pk>[0-9]+)$",
-        views.program_notification_remove,
-        name="program_notification_remove",
-    ),
-    url(
         r"^program/(?P<program_pk>[0-9]+)/calculate$",
         views.program_calculate,
         name="program_calculate",
     ),
     url(
+        r"^program/(?P<program_pk>[0-9]+)/stats$",
+        views.program_stats,
+        name="program_stats",
+    ),
+    url(
         r"^program/(?P<program_pk>[0-9]+)/notify$",
         views.program_notify,
         name="program_notify",
+    ),
+    url(
+        r"^program/(?P<program_pk>[0-9]+)/notifications$",
+        views.program_notifications,
+        name="program_notifications",
     ),
     url(
         r"^program/(?P<program_pk>[0-9]+)/add_item$",
