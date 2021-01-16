@@ -60,7 +60,7 @@ esi-assets.read_corporation_assets.v1
 
 Configure your AA settings (`local.py`) as follows:
 
-- Add `eveuniverse` and `'buybacks'` to `INSTALLED_APPS`
+- Add `'eveuniverse'` and `'buybacks'` to `INSTALLED_APPS`
 - Add these lines to bottom of your settings file:
 
    ```python
