@@ -95,6 +95,9 @@ class Corporation(models.Model):
             notification = Notification.objects.filter(
                 program_location__office__location__id=contract["start_location_id"],
                 total=contract["price"],
+                user__character_ownerships__character__character_id=contract[
+                    "issuer_id"
+                ],
             ).first()
 
             if notification is not None:
