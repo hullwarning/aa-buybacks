@@ -9,29 +9,33 @@
     <table style="width: 100%; margin: auto;" class="table table-striped table-condensed">
         <thead>
             <tr>
-                {% if show_user %}
+                {% if not mine %}
                 <th style="width: 15%;">{% trans "User" %}</th>
                 {% endif %}
                 <th style="width: 20%;">{% trans "Buyback Program" %}</th>
                 <th style="width: 15%;">{% trans "Corporation" %}</th>
                 <th style="width: 25%;">{% trans "Location" %}</th>
+                {% if mine or perms.buybacks.manage_programs %}
                 <th style="width: 5%;">{% trans "Actions" %}</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
             {% for notification in bb_notifications %}
             <tr>
-                {% if show_user %}
+                {% if not mine %}
                 <td style="line-height: 35px;">{{ notification.user.username }}</td>
                 {% endif %}
                 <td style="line-height: 35px;">{{ notification.program_location.program.name }}</td>
                 <td style="line-height: 35px;">{{ notification.program_location.program.corporation }}</td>
                 <td style="line-height: 35px;">{{ notification.program_location.office }}</td>
+                {% if mine or perms.buybacks.manage_programs %}
                 <td>
                     <a class="btn btn-sm btn-danger" href="{% url remove_url notification_pk=notification.id program_pk=notification.program_location.program.id %}">
                         Delete
                     </a>
                 </td>
+                {% endif %}
             </tr>
             <tr>
                 <td colspan="4" style="padding: 20px;">

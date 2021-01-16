@@ -13,14 +13,14 @@ def my_stats(request):
 
     context = {
         "contracts": contracts,
-        "show_user": False,
+        "mine": True,
     }
 
     return render(request, "buybacks/stats.html", context)
 
 
 @login_required
-@permission_required("buybacks.manage_programs")
+@permission_required("buybacks.basic_access")
 def program_stats(request, program_pk):
     contracts = Contract.objects.filter(
         program__pk=program_pk,
@@ -28,7 +28,7 @@ def program_stats(request, program_pk):
 
     context = {
         "contracts": contracts,
-        "show_user": True,
+        "mine": False,
     }
 
     return render(request, "buybacks/stats.html", context)

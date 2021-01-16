@@ -76,7 +76,7 @@ def my_notifications(request):
         "bb_notifications": notifications,
         "items": items,
         "remove_url": "buybacks:notification_remove",
-        "show_user": False,
+        "mine": True,
     }
 
     return render(request, "buybacks/notifications.html", context)
@@ -96,6 +96,17 @@ def notification_remove(request, notification_pk, program_pk):
 
 @login_required
 @permission_required("buybacks.manage_programs")
+def program_notification_remove(request, notification_pk, program_pk):
+    Notification.objects.filter(
+        pk=notification_pk,
+        program_location__program__id=program_pk,
+    ).delete()
+
+    return redirect("buybacks:program_notifications", program_pk=program_pk)
+
+
+@login_required
+@permission_required("buybacks.basic_access")
 def program_notifications(request, program_pk):
     notifications = Notification.objects.filter(
         program_location__program__id=program_pk,
@@ -119,18 +130,7 @@ def program_notifications(request, program_pk):
         "bb_notifications": notifications,
         "items": items,
         "remove_url": "buybacks:program_notification_remove",
-        "show_user": True,
+        "mine": False,
     }
 
     return render(request, "buybacks/notifications.html", context)
-
-
-@login_required
-@permission_required("buybacks.manage_programs")
-def program_notification_remove(request, notification_pk, program_pk):
-    Notification.objects.filter(
-        pk=notification_pk,
-        program_location__program__id=program_pk,
-    ).delete()
-
-    return redirect("buybacks:program_notifications", program_pk=program_pk)
