@@ -21,6 +21,11 @@ urlpatterns = [
         views.notification_remove,
         name="notification_remove",
     ),
+    url(
+        r"^notification/(?P<notification_pk>[0-9]+)/edit$",
+        views.notification_edit,
+        name="notification_edit",
+    ),
     path("program_add", views.program_add, name="program_add"),
     path("program_add_2", views.program_add_2, name="program_add_2"),
     url(

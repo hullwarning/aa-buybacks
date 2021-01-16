@@ -88,3 +88,29 @@ class CalculatorForm(forms.Form):
         self.fields["office"].queryset = ProgramLocation.objects.filter(
             program=program,
         )
+
+
+class NotificationForm(forms.Form):
+    user = forms.CharField(
+        label="User",
+        help_text="User who created this notification",
+    )
+    office = forms.ModelChoiceField(
+        queryset=ProgramLocation.objects.none(),
+        label="Location",
+        help_text="Structure or station from where you contracted your items",
+        empty_label=None,
+    )
+
+    def __init__(self, *args, **kwargs):
+        notification = kwargs.pop("notification", None)
+
+        super(NotificationForm, self).__init__(*args, **kwargs)
+
+        self.fields["user"].initial = notification.user
+        self.fields["user"].widget.attrs["readonly"] = True
+
+        self.fields["office"].queryset = ProgramLocation.objects.filter(
+            program=notification.program_location.program,
+        )
+        self.fields["office"].initial = notification.program_location

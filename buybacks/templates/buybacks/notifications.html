@@ -10,13 +10,13 @@
         <thead>
             <tr>
                 {% if not mine %}
-                <th style="width: 15%;">{% trans "User" %}</th>
+                <th>{% trans "User" %}</th>
                 {% endif %}
-                <th style="width: 20%;">{% trans "Buyback Program" %}</th>
-                <th style="width: 15%;">{% trans "Corporation" %}</th>
-                <th style="width: 25%;">{% trans "Location" %}</th>
+                <th>{% trans "Buyback Program" %}</th>
+                <th>{% trans "Corporation" %}</th>
+                <th>{% trans "Location" %}</th>
                 {% if mine or perms.buybacks.manage_programs %}
-                <th style="width: 5%;">{% trans "Actions" %}</th>
+                <th class="text-center">{% trans "Actions" %}</th>
                 {% endif %}
             </tr>
         </thead>
@@ -30,7 +30,10 @@
                 <td style="line-height: 35px;">{{ notification.program_location.program.corporation }}</td>
                 <td style="line-height: 35px;">{{ notification.program_location.office }}</td>
                 {% if mine or perms.buybacks.manage_programs %}
-                <td>
+                <td class="text-center">
+                    <a class="btn btn-sm btn-warning" href="{% url 'buybacks:notification_edit' notification_pk=notification.id %}?mine={{ mine }}">
+                        Edit
+                    </a>
                     <a class="btn btn-sm btn-danger" href="{% url 'buybacks:notification_remove' notification_pk=notification.id %}?mine={{ mine }}">
                         Delete
                     </a>

@@ -10,6 +10,7 @@ from eveuniverse.models import EveType
 
 from ..models import Notification, Program, ProgramLocation
 from ..utils import messages_plus
+from ..forms import NotificationForm
 
 
 @csrf_exempt
@@ -100,6 +101,67 @@ def notification_remove(request, notification_pk):
         )
 
     return redirect("buybacks:my_notifications")
+
+
+@login_required
+@permission_required("buybacks.basic_access")
+def notification_edit(request, notification_pk):
+    mine = request.GET.get("mine", "True") == "True"
+
+    notification = Notification.objects.filter(pk=notification_pk)
+
+    if not mine and not request.user.has_perm("buybacks.manage_programs"):
+        return redirect("buybacks:index")
+
+    if mine:
+        notification = notification.filter(user=request.user)
+
+    notification = notification.first()
+
+    if notification is None:
+        return redirect("buybacks:my_notifications")
+
+    if request.method != "POST":
+        form = NotificationForm(notification=notification)
+    else:
+        form = NotificationForm(request.POST, notification=notification)
+
+        if form.is_valid():
+            notification.program_location = form.cleaned_data["office"]
+
+            try:
+                notification.save()
+
+                messages_plus.success(
+                    request,
+                    format_html(
+                        "Edited notification location to <strong>{}</strong>",
+                        notification.program_location,
+                    ),
+                )
+
+                if mine:
+                    return redirect("buybacks:my_notifications")
+                else:
+                    return redirect(
+                        "buybacks:program_notifications",
+                        program_pk=notification.program_location.program.id,
+                    )
+
+            except Exception:
+                messages_plus.error(
+                    request,
+                    "Failed to edit location of the notification",
+                )
+
+    context = {
+        "corporation": notification.program_location.program.corporation.corporation,
+        "form": form,
+        "notification": notification,
+        "mine": mine,
+    }
+
+    return render(request, "buybacks/notification_edit.html", context)
 
 
 @login_required
