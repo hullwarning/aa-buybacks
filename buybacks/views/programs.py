@@ -8,7 +8,6 @@ from django.urls import reverse
 from esi.models import Token
 from esi.decorators import token_required
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
-from allianceauth.services.hooks import get_extension_logger
 
 from ..helpers import evemarketer
 from ..models import Program, ProgramItem, ProgramLocation, Corporation
@@ -16,8 +15,6 @@ from ..forms import ProgramForm, ProgramItemForm, ProgramLocationForm, Calculato
 from ..utils import messages_plus
 
 ADD_PROGRAM_TOKEN_TAG = "buybacks_add_program_token"
-
-logger = get_extension_logger(__name__)
 
 @login_required
 @permission_required("buybacks.basic_access")
@@ -47,13 +44,12 @@ def program_calculate(request, program_pk):
             ).first()
 
             for item in items.split("\n"):
-                logger.debug(item)
 
                 parts = item.split("\t")
 
                 if len(parts) >= 2:
                     name = parts[0]
-                    
+
                     quantity = int(parts[1].replace(" ", "").replace(".", "").replace("\xa0", ""))
 
                     if name in data:
