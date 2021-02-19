@@ -16,6 +16,7 @@ from ..utils import messages_plus
 
 ADD_PROGRAM_TOKEN_TAG = "buybacks_add_program_token"
 
+
 @login_required
 @permission_required("buybacks.basic_access")
 def program_calculate(request, program_pk):
@@ -50,7 +51,9 @@ def program_calculate(request, program_pk):
                 if len(parts) >= 2:
                     name = parts[0]
 
-                    quantity = int(parts[1].replace(" ", "").replace(".", "").replace("\xa0", ""))
+                    quantity = int(
+                        parts[1].replace(" ", "").replace(".", "").replace("\xa0", "")
+                    )
 
                     if name in data:
                         data[name] += quantity
