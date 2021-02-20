@@ -7,6 +7,7 @@ from ...constants import EVE_CATEGORY_ID_MODULE, EVE_CATEGORY_ID_CHARGE
 from ...constants import EVE_CATEGORY_ID_COMMODITY, EVE_CATEGORY_ID_DRONE
 from ...constants import EVE_CATEGORY_ID_ASTEROID, EVE_CATEGORY_ID_FIGHTER
 from ...constants import EVE_CATEGORY_ID_PLANETRAY_COMMODITY
+from ...constants import EVE_GROUP_ID_HARVESTABLE_CLOUD
 
 
 class Command(BaseCommand):
@@ -34,4 +35,6 @@ class Command(BaseCommand):
             str(EVE_CATEGORY_ID_PLANETRAY_COMMODITY),
             "--category_id",
             str(EVE_CATEGORY_ID_FIGHTER),
+            "--group_id",
+            str(EVE_GROUP_ID_HARVESTABLE_CLOUD),
         )

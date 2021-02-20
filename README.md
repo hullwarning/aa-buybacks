@@ -102,7 +102,7 @@ Name | Purpose | Code
 -- | -- | --
 Can access this app and view buyback programs |Enabling the app for a user. This permission should be enabled for everyone who is allowed to use the app (e.g. Member state) | `basic_access`
 Can setup corporation | Add or updates the character for syncing offices and contracts. This should be limited to users with admins / leadership privileges. | `setup_retriever`
-Can manage buyback programs | User with this permission can manage the buyback programs and view the cumulative statistics | `manage_programs`
+Can manage buyback programs | User with this permission can manage the buyback programs and notifications | `manage_programs`
 
 ### Setup corp
 
@@ -145,6 +145,10 @@ pip install -U aa-buybacks
 ```bash
 python manage.py migrate
 python manage.py collectstatic
+```
+
+```bash
+python manage.py buybacks_load_types
 ```
 
 Finally restart your AA supervisor services.
