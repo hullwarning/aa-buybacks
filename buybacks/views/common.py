@@ -32,7 +32,7 @@ def item_autocomplete(request):
     q = request.GET.get("q", None)
 
     if q is not None:
-        items = items.filter(name__contains=q)
+        items = items.filter(name__icontains=q)
 
     items = items.annotate(
         value=F("id"),
