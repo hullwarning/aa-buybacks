@@ -45,14 +45,16 @@ def program_calculate(request, program_pk):
             ).first()
 
             for item in items.split("\n"):
-
                 parts = item.split("\t")
 
                 if len(parts) >= 2:
                     name = parts[0]
-
                     quantity = int(
-                        parts[1].replace(" ", "").replace(".", "").replace("\xa0", "")
+                        parts[1]
+                        .replace(" ", "")
+                        .replace(".", "")
+                        .replace("\xa0", "")
+                        .replace("\r", "")
                     )
 
                     if name in data:
