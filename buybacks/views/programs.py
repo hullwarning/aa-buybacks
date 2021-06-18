@@ -55,6 +55,7 @@ def program_calculate(request, program_pk):
                         .replace(".", "")
                         .replace("\xa0", "")
                         .replace("\r", "")
+                        .replace(",","")
                     )
 
                     if name in data:
