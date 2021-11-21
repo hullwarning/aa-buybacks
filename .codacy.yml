@@ -1,0 +1,10 @@
+---
+exclude_paths:
+  - "runtests.py"
+  - "testauth/*"
+  - "**/*.md"
+  - "**.md"
+  - "**/*.yml"
+  - "**.yml"
+  - "**/*.yaml"
+  - "**.yaml"

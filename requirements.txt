@@ -1,0 +1,7 @@
+Django~=3.2.9
+allianceauth~=2.9.2
+pre_commit
+celery~=5.2.1
+bravado~=10.6.3
+requests~=2.26.0
+requests-cache

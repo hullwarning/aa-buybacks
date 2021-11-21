@@ -1,0 +1,10 @@
+{% extends 'allianceauth/base.html' %}
+{% load i18n %}
+
+{% block page_title %}{% translate "Buybacks" %}{% endblock %}
+
+{% block content %}
+    <br/>
+    {% include 'buybacks2/menu.html' %}
+    {% block details %}{% endblock %}
+{% endblock %}

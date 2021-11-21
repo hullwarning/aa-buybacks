@@ -1,5 +1,5 @@
 include LICENSE
 include README.md
-recursive-include buybacks *.py
-recursive-include buybacks/static *
-recursive-include buybacks/templates *
+recursive-include buybacks2 *.py
+recursive-include buybacks2/static *
+recursive-include buybacks2/templates *
