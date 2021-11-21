@@ -8,11 +8,11 @@
 from time import sleep
 
 from bravado.exception import HTTPBadGateway, HTTPGatewayTimeout, HTTPServiceUnavailable
+from requests_cache import CachedSession
 
 from allianceauth.services.hooks import get_extension_logger
 from esi.clients import esi_client_factory
 from esi.models import Token
-from requests_cache import CachedSession
 
 logger = get_extension_logger(__name__)
 
@@ -21,8 +21,21 @@ ESI_RETRY_SLEEP_SECS = 1
 
 _my_esi_client = None
 
-market_api = CachedSession('market.fuzzwork.cache', backend='filesystem', use_cache_dir=True, expire_after=330, cache_control=True)
-esi_api = CachedSession('esi.cache', backend='filesystem', use_cache_dir=True, expire_after=330, cache_control=True)
+market_api = CachedSession(
+    "market.fuzzwork.cache",
+    backend="filesystem",
+    use_cache_dir=True,
+    expire_after=330,
+    cache_control=True,
+)
+esi_api = CachedSession(
+    "esi.cache",
+    backend="filesystem",
+    use_cache_dir=True,
+    expire_after=330,
+    cache_control=True,
+)
+
 
 def fuzzworkmarket_lookup(type_ids: [int] = None) -> dict:
     if type_ids is None:

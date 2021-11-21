@@ -78,10 +78,10 @@ def program_calculate(request, program_pk):
                     * prices[typeids[name]]["buy"]
                 )
 
-                value[name]['unit_price'] = item_value
-                value[name]['typeid'] = typeids[name]
-                value[name]['quantity'] = data[name]
-                value[name]['name'] = name
+                value[name]["unit_price"] = item_value
+                value[name]["typeid"] = typeids[name]
+                value[name]["quantity"] = data[name]
+                value[name]["name"] = name
                 total += item_value
 
             total = math.ceil(total)
@@ -300,7 +300,9 @@ def program_add_2(request):
                 name = form.cleaned_data["name"]
 
                 try:
-                    bb_program = Program.objects.create(name=name, corporation=corporation)
+                    bb_program = Program.objects.create(
+                        name=name, corporation=corporation
+                    )
                     MessagesPlus.success(
                         request,
                         format_html(

@@ -12,9 +12,7 @@ module_urls = [
         common.item_autocomplete,
         name="item_autocomplete",
     ),
-    url(
-        "my_notifications/", notifications.my_notifications, name="my_notifications"
-    ),
+    url("my_notifications/", notifications.my_notifications, name="my_notifications"),
     url("my_stats/", stats.my_stats, name="my_stats"),
     url(
         r"^notification/(?P<notification_pk>[0-9]+)/remove$",
@@ -86,5 +84,5 @@ module_urls = [
 ]
 
 urlpatterns = [
-    url("^{}/".format(app_name), include((module_urls, app_name), namespace=app_name)),
+    url(f"^{app_name}/", include((module_urls, app_name), namespace=app_name)),
 ]
