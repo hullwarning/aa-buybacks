@@ -69,12 +69,12 @@ jobs:
         env:
           DJANGO: ${{ matrix.django-version }}
 
-      - name: Upload Coverage Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage-python-${{ matrix.python-version }}-django-${{ matrix.django-version }}
-          path: coverage.xml
-          if-no-files-found: ignore
+#      - name: Upload Coverage Artifacts
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: coverage-python-${{ matrix.python-version }}-django-${{ matrix.django-version }}
+#          path: coverage.xml
+#          if-no-files-found: ignore
 
   # Pypi Build Test
   pypi-build-test:
