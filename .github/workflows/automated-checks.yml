@@ -34,7 +34,7 @@ jobs:
 
   # Run Test Coverage
   test-coverage:
-    needs: [codacy-security-scan]
+    needs: [pre-commit]
     name: Test Coverage (Python ${{ matrix.python-version }}, Django ${{ matrix.django-version }})
     runs-on: ubuntu-latest
 
