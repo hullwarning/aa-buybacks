@@ -5,17 +5,17 @@ from .views import common, notifications, programs, stats
 app_name = "buybacks2"
 
 module_urls = [
-    url(r"^/$", common.index, name="index"),
-    url(r"^setup/$", common.setup, name="setup"),
+    url("", common.index, name="index"),
+    url("^setup/", common.setup, name="setup"),
     url(
-        r"^item_autocomplete/$",
+        "^item_autocomplete/",
         common.item_autocomplete,
         name="item_autocomplete",
     ),
     url(
-        r"^my_notifications/$", notifications.my_notifications, name="my_notifications"
+        "my_notifications/", notifications.my_notifications, name="my_notifications"
     ),
-    url(r"^my_stats/$", stats.my_stats, name="my_stats"),
+    url("my_stats/", stats.my_stats, name="my_stats"),
     url(
         r"^notification/(?P<notification_pk>[0-9]+)/remove$",
         notifications.notification_remove,
@@ -26,8 +26,8 @@ module_urls = [
         notifications.notification_edit,
         name="notification_edit",
     ),
-    url(r"^program_add/$", programs.program_add, name="program_add"),
-    url(r"^program_add_2/$", programs.program_add_2, name="program_add_2"),
+    url("program_add/", programs.program_add, name="program_add"),
+    url("program_add_2/", programs.program_add_2, name="program_add_2"),
     url(
         r"^program/(?P<program_pk>[0-9]+)/edit$",
         programs.program_edit,
@@ -86,5 +86,5 @@ module_urls = [
 ]
 
 urlpatterns = [
-    url(fr"^{app_name}/", include((module_urls, app_name), namespace=app_name)),
+    url("^{}/".format(app_name), include((module_urls, app_name), namespace=app_name)),
 ]
